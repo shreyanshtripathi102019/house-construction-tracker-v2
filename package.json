@@ -1,0 +1,14 @@
+{
+  "name": "house-construction-tracker-v2",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Parallel track: House Construction Tracker on Supabase + Vercel",
+  "type": "module",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.7",
+    "uuid": "^9.0.1"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
