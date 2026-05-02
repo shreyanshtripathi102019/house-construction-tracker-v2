@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     if (!VALID_KINDS.includes(entryKind)) return err(res, 'Invalid entry type.');
     const expenseAt = time ? `${date}T${time}` : date;
     const sb = getSupabase();
-    const { error } = await sb.from('expenses').insert({
+    const { error } = await sb.from('hc_expenses').insert({
       id: uuidv4(),
       expense_at: expenseAt,
       category, description, amount, payment_mode: paymentMode,

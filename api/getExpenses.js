@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   try {
     requireOwner(req);
     const sb = getSupabase();
-    const { data, error } = await sb.from('expenses').select('*');
+    const { data, error } = await sb.from('hc_expenses').select('*');
     if (error) throw error;
     const expenses = sortExpensesDesc((data || []).map(mapExpense));
     return json(res, { expenses });

@@ -6,7 +6,7 @@ export default async function handler(req, res) {
     if (!contractorName) return err(res, 'contractorName is required.');
     const sb = getSupabase();
     const { data, error } = await sb
-      .from('expenses')
+      .from('hc_expenses')
       .select('*')
       .ilike('paid_to', contractorName);
     if (error) throw error;

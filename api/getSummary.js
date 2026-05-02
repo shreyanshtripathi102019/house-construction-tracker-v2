@@ -5,8 +5,8 @@ export default async function handler(req, res) {
     requireOwner(req);
     const sb = getSupabase();
     const [expRes, setRes] = await Promise.all([
-      sb.from('expenses').select('*'),
-      sb.from('settings').select('key,value')
+      sb.from('hc_expenses').select('*'),
+      sb.from('hc_settings').select('key,value')
     ]);
     if (expRes.error) throw expRes.error;
     if (setRes.error) throw setRes.error;

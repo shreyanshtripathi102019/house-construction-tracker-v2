@@ -5,12 +5,12 @@ export default async function handler(req, res) {
     requireOwner(req);
     const amount = toNumber(req.body?.amount);
     const sb = getSupabase();
-    const { data: existing } = await sb.from('settings').select('key').eq('key', 'TOTAL_BUDGET').maybeSingle();
+    const { data: existing } = await sb.from('hc_settings').select('key').eq('key', 'TOTAL_BUDGET').maybeSingle();
     let error;
     if (existing) {
-      ({ error } = await sb.from('settings').update({ value: String(amount) }).eq('key', 'TOTAL_BUDGET'));
+      ({ error } = await sb.from('hc_settings').update({ value: String(amount) }).eq('key', 'TOTAL_BUDGET'));
     } else {
-      ({ error } = await sb.from('settings').insert({ key: 'TOTAL_BUDGET', value: String(amount) }));
+      ({ error } = await sb.from('hc_settings').insert({ key: 'TOTAL_BUDGET', value: String(amount) }));
     }
     if (error) throw error;
     return json(res, { success: true });

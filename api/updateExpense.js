@@ -24,7 +24,7 @@ export default async function handler(req, res) {
     if (!VALID_KINDS.includes(entryKind)) return err(res, 'Invalid entry type.');
     const expenseAt = time ? `${date}T${time}` : date;
     const sb = getSupabase();
-    const { error } = await sb.from('expenses').update({
+    const { error } = await sb.from('hc_expenses').update({
       expense_at: expenseAt, category, description, amount,
       payment_mode: paymentMode, paid_to: paidTo, screenshot_url: screenshotUrl,
       paid_by: paidBy, entry_kind: entryKind, advance_party: advanceParty

@@ -117,21 +117,21 @@
           <a class="btn btn-secondary" href="#contractor" data-i18n="contractorBtn">Contractor panel</a>
         </div>
         <div class="stats">
-          <div class="stat"><div class="label" data-i18n="budgetLabel">Total budget</div><div class="value">₹12,00,000</div></div>
-          <div class="stat"><div class="label" data-i18n="spentLabel">Tracked spent</div><div class="value">₹5,52,400</div></div>
-          <div class="stat"><div class="label" data-i18n="pendingLabel">Pending</div><div class="value">₹1,38,000</div></div>
+          <div class="stat"><div class="label" data-i18n="budgetLabel">Total budget</div><div class="value" id="valTotalBudget">₹--</div></div>
+          <div class="stat"><div class="label" data-i18n="spentLabel">Tracked spent</div><div class="value" id="valSpent">₹--</div></div>
+          <div class="stat"><div class="label" data-i18n="pendingLabel">Pending</div><div class="value" id="valPending">₹--</div></div>
         </div>
       </div>
       <aside class="hero-panel" aria-label="project status">
         <div class="banner" data-i18n="parallelNote">V2 is isolated from the current production tracker. Use it for review, migration, and safer backend expansion.</div>
         <div class="card">
           <div class="tiny" data-i18n="burnTitle">Budget progress</div>
-          <div class="metric">46%</div>
-          <div class="progress" aria-hidden="true"><span></span></div>
+          <div class="metric" id="valBurn">--%</div>
+          <div class="progress" aria-hidden="true"><span id="valBurnBar" style="width:0%"></span></div>
         </div>
         <div class="split">
-          <div class="card"><div class="tiny" data-i18n="materialsLabel">Material entries</div><div class="metric">124</div></div>
-          <div class="card"><div class="tiny" data-i18n="labourLabel">Labour payouts</div><div class="metric">18</div></div>
+          <div class="card"><div class="tiny" data-i18n="materialsLabel">Material entries</div><div class="metric" id="valMatCount">--</div></div>
+          <div class="card"><div class="tiny" data-i18n="labourLabel">Labour payouts</div><div class="metric" id="valLabCount">--</div></div>
         </div>
       </aside>
     </section>
@@ -157,45 +157,55 @@
             <h2 data-i18n="ownerTitle">Owner workspace</h2>
             <p class="muted" data-i18n="ownerLead">Control the budget, audit entries, and review spend by phase.</p>
           </div>
+          <div id="ownerAuth" style="display: flex; gap: 0.5rem; align-items: center;">
+            <input type="password" id="ownerPassword" placeholder="Owner Password" style="padding: 0.5rem; max-width: 150px; border-radius: var(--radius-sm);">
+            <button class="btn btn-secondary" style="min-height: auto; padding: 0.5rem 1rem;" onclick="loginOwner()">Unlock</button>
+          </div>
         </div>
-        <div class="form-grid">
+        <div class="form-grid" id="ownerForm" style="opacity: 0.5; pointer-events: none;">
           <label>
             <span data-i18n="expenseType">Expense type</span>
-            <select>
-              <option data-i18n="materialOpt">Material</option>
-              <option data-i18n="labourOpt">Labour</option>
-              <option data-i18n="transportOpt">Transport</option>
-              <option data-i18n="miscOpt">Miscellaneous</option>
+            <select id="expType">
+              <option data-i18n="materialOpt" value="Material">Material</option>
+              <option data-i18n="labourOpt" value="Labour">Labour</option>
+              <option data-i18n="transportOpt" value="Transport">Transport</option>
+              <option data-i18n="miscOpt" value="Miscellaneous">Miscellaneous</option>
             </select>
           </label>
           <label>
             <span data-i18n="amountLabel">Amount</span>
-            <input type="number" placeholder="25000" />
+            <input type="number" id="expAmount" placeholder="25000" />
           </label>
           <label>
             <span data-i18n="vendorLabel">Vendor / contractor</span>
-            <input type="text" placeholder="Jaya Prakash" />
+            <div style="display: flex; gap: 0.5rem;">
+              <select id="vendorSelect" style="flex: 1;"><option value="">Select...</option></select>
+              <input type="text" id="vendorInput" placeholder="Or new vendor" style="flex: 1;" />
+            </div>
           </label>
           <label>
             <span data-i18n="dateLabel">Date</span>
-            <input type="date" />
+            <input type="date" id="expDate" />
           </label>
           <label style="grid-column:1/-1">
             <span data-i18n="notesLabel">Notes</span>
-            <textarea placeholder="Cement advance for first floor slab"></textarea>
+            <textarea id="expNotes" placeholder="Cement advance for first floor slab"></textarea>
+          </label>
+          <label style="grid-column:1/-1">
+            <span>Payment Proof</span>
+            <input type="file" id="expProof" accept="image/*" />
           </label>
         </div>
-        <div class="cta-row">
-          <button class="btn btn-primary" type="button" data-i18n="saveExpense">Save expense</button>
-          <button class="btn btn-secondary" type="button" data-i18n="uploadProof">Upload payment proof</button>
+        <div class="cta-row" id="ownerCta" style="opacity: 0.5; pointer-events: none;">
+          <button class="btn btn-primary" type="button" data-i18n="saveExpense" onclick="saveExpense()">Save expense</button>
         </div>
       </div>
       <div class="panel">
         <h2 data-i18n="summaryTitle">Current snapshot</h2>
         <div class="card-grid" style="grid-template-columns:1fr; margin-top:1rem;">
-          <div class="card"><div class="tiny" data-i18n="cashFlow">This month spend</div><div class="metric">₹1,14,200</div></div>
-          <div class="card"><div class="tiny" data-i18n="contractorDue">Contractor due</div><div class="metric">₹42,000</div></div>
-          <div class="card"><div class="tiny" data-i18n="materialDue">Material pending</div><div class="metric">₹96,000</div></div>
+          <div class="card"><div class="tiny" data-i18n="cashFlow">This month spend</div><div class="metric" id="valCashFlow">₹--</div></div>
+          <div class="card"><div class="tiny" data-i18n="contractorDue">Contractor due</div><div class="metric" id="valContractorDue">₹--</div></div>
+          <div class="card"><div class="tiny" data-i18n="materialDue">Material pending</div><div class="metric" id="valMaterialDue">₹--</div></div>
         </div>
       </div>
     </section>
@@ -206,6 +216,9 @@
           <h2 data-i18n="contractorTitle">Contractor view</h2>
           <p class="muted" data-i18n="contractorLead">Simple payment history and balances, without exposing the full owner budget.</p>
         </div>
+        <select id="contractorViewSelect" onchange="loadContractorPayments()" style="max-width: 200px; padding: 0.5rem; border-radius: var(--radius-sm); border: 1px solid var(--color-border); background: var(--color-surface-2);">
+          <option value="">Select Contractor...</option>
+        </select>
       </div>
       <div class="table-wrap">
         <table>
@@ -217,10 +230,8 @@
               <th data-i18n="thStatus">Status</th>
             </tr>
           </thead>
-          <tbody>
-            <tr><td>2026-05-01</td><td data-i18n="row1work">Masonry labour advance</td><td>₹25,000</td><td><span class="tag tag-paid" data-i18n="paid">Paid</span></td></tr>
-            <tr><td>2026-04-28</td><td data-i18n="row2work">Shuttering labour</td><td>₹17,000</td><td><span class="tag tag-paid" data-i18n="paid">Paid</span></td></tr>
-            <tr><td>2026-04-24</td><td data-i18n="row3work">Finishing labour balance</td><td>₹42,000</td><td><span class="tag tag-pending" data-i18n="pending">Pending</span></td></tr>
+          <tbody id="contractorTableBody">
+            <tr><td colspan="4" style="text-align: center;">Select a contractor to view history</td></tr>
           </tbody>
         </table>
       </div>
@@ -264,6 +275,154 @@
     });
 
     applyLang();
+
+    // App Logic
+    let secret = localStorage.getItem('ownerSecret') || '';
+
+    if (secret) {
+      document.getElementById('ownerPassword').value = secret;
+      fetchSummary();
+    }
+    fetchContractors();
+
+    async function fetchSummary() {
+      if (!secret) return;
+      try {
+        const res = await fetch(`/api/getSummary?secret=${encodeURIComponent(secret)}`);
+        if (!res.ok) throw new Error('Auth failed');
+        const data = await res.json();
+        
+        document.getElementById('ownerForm').style.opacity = '1';
+        document.getElementById('ownerForm').style.pointerEvents = 'auto';
+        document.getElementById('ownerCta').style.opacity = '1';
+        document.getElementById('ownerCta').style.pointerEvents = 'auto';
+
+        document.getElementById('valTotalBudget').textContent = `₹${data.totalBudget.toLocaleString('en-IN')}`;
+        document.getElementById('valSpent').textContent = `₹${data.summary.total.toLocaleString('en-IN')}`;
+        document.getElementById('valPending').textContent = `₹${(data.totalBudget - data.summary.total).toLocaleString('en-IN')}`;
+        
+        const burn = data.totalBudget ? Math.round((data.summary.total / data.totalBudget) * 100) : 0;
+        document.getElementById('valBurn').textContent = `${burn}%`;
+        document.getElementById('valBurnBar').style.width = `${burn}%`;
+
+        document.getElementById('valCashFlow').textContent = `₹${data.summary.total.toLocaleString('en-IN')}`; 
+        document.getElementById('valContractorDue').textContent = `₹${(data.laluAdvanceBalance || 0).toLocaleString('en-IN')}`;
+        document.getElementById('valMaterialDue').textContent = `₹${(data.summary.Material || 0).toLocaleString('en-IN')}`;
+        
+      } catch (e) {
+        console.error(e);
+        alert('Failed to load summary. Check owner password.');
+      }
+    }
+
+    function loginOwner() {
+      secret = document.getElementById('ownerPassword').value;
+      localStorage.setItem('ownerSecret', secret);
+      fetchSummary();
+    }
+
+    async function fetchContractors() {
+      try {
+        const res = await fetch('/api/getContractors');
+        if (!res.ok) return;
+        const data = await res.json();
+        const opts = '<option value="">Select...</option>' + data.contractors.map(c => `<option value="${c.Name}">${c.Name}</option>`).join('');
+        document.getElementById('vendorSelect').innerHTML = opts;
+        document.getElementById('contractorViewSelect').innerHTML = opts;
+      } catch(e) {
+        console.error(e);
+      }
+    }
+
+    async function loadContractorPayments() {
+      const name = document.getElementById('contractorViewSelect').value;
+      const tbody = document.getElementById('contractorTableBody');
+      if (!name) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Select a contractor to view history</td></tr>';
+        return;
+      }
+      try {
+        const res = await fetch(`/api/getContractorPayments?contractorName=${encodeURIComponent(name)}`);
+        const data = await res.json();
+        if (data.payments.length === 0) {
+           tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No payments found</td></tr>';
+           return;
+        }
+        tbody.innerHTML = data.payments.map(p => `
+          <tr>
+            <td>${p.Date ? p.Date.split('T')[0] : ''}</td>
+            <td>${p.Description}</td>
+            <td>₹${p.Amount.toLocaleString('en-IN')}</td>
+            <td><span class="tag tag-paid" data-i18n="paid">Paid</span></td>
+          </tr>
+        `).join('');
+        applyLang();
+      } catch(e) {
+        console.error(e);
+      }
+    }
+
+    async function saveExpense() {
+      if (!secret) return alert('Unlock owner view first');
+      const type = document.getElementById('expType').value;
+      const amount = document.getElementById('expAmount').value;
+      const vendor = document.getElementById('vendorSelect').value || document.getElementById('vendorInput').value;
+      const date = document.getElementById('expDate').value;
+      const notes = document.getElementById('expNotes').value;
+      
+      if (!amount || !vendor || !date) return alert('Please fill amount, vendor, and date');
+
+      const btn = document.querySelector('#ownerCta button');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+
+      let screenshotUrl = '';
+      const fileInput = document.getElementById('expProof');
+      if (fileInput.files.length > 0) {
+        try {
+          const file = fileInput.files[0];
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          await new Promise(r => reader.onload = r);
+          const base64 = reader.result.split(',')[1];
+          const upRes = await fetch(`/api/uploadImage`, {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ secret, imageData: base64, mimeType: file.type, fileName: file.name })
+          });
+          const upData = await upRes.json();
+          if (upData.url) screenshotUrl = upData.url;
+        } catch(e) {
+          console.error('Image upload failed', e);
+        }
+      }
+
+      try {
+        const res = await fetch('/api/addExpense', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({
+            secret, date, category: type, description: notes || type,
+            amount, paymentMode: 'Cash', paidTo: vendor, paidBy: 'Owner',
+            screenshotUrl
+          })
+        });
+        if (res.ok) {
+          alert('Expense saved successfully');
+          fetchSummary();
+          document.getElementById('expAmount').value = '';
+          document.getElementById('expNotes').value = '';
+          document.getElementById('expProof').value = '';
+        } else {
+          const err = await res.json();
+          alert('Failed to save: ' + (err.error || 'Unknown error'));
+        }
+      } catch (e) {
+        alert('Error saving expense');
+      }
+      btn.disabled = false;
+      btn.textContent = 'Save expense';
+    }
   </script>
 </body>
 </html>

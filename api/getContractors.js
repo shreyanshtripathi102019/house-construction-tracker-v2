@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   try {
     const sb = getSupabase();
     const { data, error } = await sb
-      .from('contractors')
+      .from('hc_contractors')
       .select('id, name, phone, work_type, agreed_amount')
       .order('name');
     if (error) throw error;
