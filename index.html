@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>House Construction Tracker</title>
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=zodiak@400,700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root, [data-theme="light"] {
       --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
@@ -58,7 +59,7 @@
     .tiny{font-size:var(--text-xs);color:var(--color-text-faint)}
     .metric{font-size:1.6rem;font-weight:700;margin-top:.4rem}
     .progress{height:12px;background:var(--color-primary-highlight);border-radius:999px;overflow:hidden;margin-top:.75rem}
-    .progress > span{display:block;height:100%;background:var(--color-primary);width:0%}
+    .progress > span{display:block;height:100%;background:var(--color-primary);width:0%;transition:width 0.4s ease;}
     
     table{width:100%;border-collapse:collapse}
     th,td{padding:1rem;text-align:left;border-bottom:1px solid var(--color-divider);font-size:var(--text-sm)}
@@ -134,20 +135,25 @@
     <!-- OWNER AUTH VIEW -->
     <section id="owner-auth-view" class="view-section auth-container">
       <h2 data-i18n="ownerAuthTitle">Owner Login</h2>
-      <p class="lead" data-i18n="ownerAuthDesc" style="margin-bottom:2rem;">Enter your password to access the dashboard.</p>
-      <input type="password" id="ownerPassword" placeholder="Owner Password" />
-      <button class="btn btn-primary" style="width:100%" onclick="loginOwner()" data-i18n="unlockBtn">Unlock Dashboard</button>
-      <button class="btn btn-secondary" style="width:100%; margin-top:1rem;" onclick="showView('landing-view')" data-i18n="cancelBtn">Cancel</button>
+      <p class="lead" data-i18n="ownerAuthDesc" style="margin-bottom:2rem;">Sign in or create an account.</p>
+      <input type="email" id="ownerEmail" placeholder="Email address" />
+      <input type="password" id="ownerPassword" placeholder="Password" />
+      <div style="display:flex; gap:1rem;">
+        <button class="btn btn-primary" style="flex:1;" onclick="loginOwner()" data-i18n="loginBtn">Log In</button>
+        <button class="btn btn-secondary" style="flex:1;" onclick="signupOwner()" data-i18n="signupBtn">Sign Up</button>
+      </div>
+      <button class="btn btn-secondary" style="width:100%; margin-top:1rem; border:none;" onclick="showView('landing-view')" data-i18n="cancelBtn">Cancel</button>
     </section>
 
     <!-- CONTRACTOR AUTH VIEW -->
     <section id="contractor-auth-view" class="view-section auth-container">
       <h2 data-i18n="contractorAuthTitle">Contractor Login</h2>
-      <p class="lead" data-i18n="contractorAuthDesc" style="margin-bottom:2rem;">Enter your phone number and PIN.</p>
-      <input type="text" id="contractorPhone" placeholder="Phone Number (e.g. 9876543210)" />
+      <p class="lead" data-i18n="contractorAuthDesc" style="margin-bottom:2rem;">Enter the Owner's email, your phone number and PIN.</p>
+      <input type="email" id="contractorOwnerEmail" placeholder="Owner's Email Address" />
+      <input type="text" id="contractorPhone" placeholder="Your Phone (e.g. 9876543210)" />
       <input type="password" id="contractorPin" placeholder="PIN" />
       <button class="btn btn-primary" style="width:100%" onclick="loginContractor()" data-i18n="loginBtn">Login</button>
-      <button class="btn btn-secondary" style="width:100%; margin-top:1rem;" onclick="showView('landing-view')" data-i18n="cancelBtn">Cancel</button>
+      <button class="btn btn-secondary" style="width:100%; margin-top:1rem; border:none;" onclick="showView('landing-view')" data-i18n="cancelBtn">Cancel</button>
     </section>
 
     <!-- OWNER DASHBOARD -->
@@ -262,8 +268,8 @@
         landingTitle:'House Construction Tracker', landingLead:'Select your role to continue securely.',
         roleOwner:'Owner', roleOwnerDesc:'Manage budget, track expenses, and oversee contractors.',
         roleContractor:'Contractor', roleContractorDesc:'View your payments and project balance.',
-        ownerAuthTitle:'Owner Login', ownerAuthDesc:'Enter your password to access the dashboard.', unlockBtn:'Unlock Dashboard', cancelBtn:'Cancel',
-        contractorAuthTitle:'Contractor Login', contractorAuthDesc:'Enter your phone number and PIN.', loginBtn:'Login',
+        ownerAuthTitle:'Owner Login', ownerAuthDesc:'Sign in or create an account.', signupBtn:'Sign Up', cancelBtn:'Cancel',
+        contractorAuthTitle:'Contractor Login', contractorAuthDesc:'Enter the Owner\'s email, your phone number and PIN.', loginBtn:'Log In',
         summaryTitle:'Project Overview', budgetLabel:'Total Budget', spentLabel:'Total Spent', pendingLabel:'Remaining', burnTitle:'Budget Progress',
         addExpenseTitle:'Log New Expense', expenseType:'Category', materialOpt:'Material', labourOpt:'Labour', transportOpt:'Transport', miscOpt:'Miscellaneous', amountLabel:'Amount', vendorLabel:'Contractor / Vendor', dateLabel:'Date', notesLabel:'Notes', proofLabel:'Payment Proof', saveExpense:'Save Expense',
         manageContractorsTitle:'Add Contractor Profile', manageContractorsDesc:'Create a profile to give a contractor access to their payment history.', cNameLabel:'Name', cPhoneLabel:'Phone Number', cPinLabel:'Login PIN', saveContractorBtn:'Save Contractor',
@@ -273,8 +279,8 @@
         landingTitle:'घर निर्माण ट्रैकर', landingLead:'सुरक्षित रूप से आगे बढ़ने के लिए अपनी भूमिका चुनें।',
         roleOwner:'मालिक (Owner)', roleOwnerDesc:'बजट प्रबंधित करें, खर्च ट्रैक करें और ठेकेदारों को देखें।',
         roleContractor:'ठेकेदार (Contractor)', roleContractorDesc:'अपने भुगतान और प्रोजेक्ट बैलेंस देखें।',
-        ownerAuthTitle:'मालिक लॉगिन', ownerAuthDesc:'डैशबोर्ड तक पहुंचने के लिए अपना पासवर्ड दर्ज करें।', unlockBtn:'डैशबोर्ड खोलें', cancelBtn:'रद्द करें',
-        contractorAuthTitle:'ठेकेदार लॉगिन', contractorAuthDesc:'अपना फोन नंबर और पिन दर्ज करें।', loginBtn:'लॉगिन करें',
+        ownerAuthTitle:'मालिक लॉगिन', ownerAuthDesc:'साइन इन करें या खाता बनाएं।', signupBtn:'साइन अप करें', cancelBtn:'रद्द करें',
+        contractorAuthTitle:'ठेकेदार लॉगिन', contractorAuthDesc:'मालिक का ईमेल, अपना फोन नंबर और पिन दर्ज करें।', loginBtn:'लॉगिन करें',
         summaryTitle:'प्रोजेक्ट अवलोकन', budgetLabel:'कुल बजट', spentLabel:'कुल खर्च', pendingLabel:'बाकी', burnTitle:'बजट प्रगति',
         addExpenseTitle:'नया खर्च दर्ज करें', expenseType:'श्रेणी', materialOpt:'सामग्री', labourOpt:'मजदूरी', transportOpt:'परिवहन', miscOpt:'अन्य', amountLabel:'राशि', vendorLabel:'ठेकेदार / विक्रेता', dateLabel:'तारीख', notesLabel:'विवरण', proofLabel:'भुगतान प्रमाण', saveExpense:'खर्च सेव करें',
         manageContractorsTitle:'ठेकेदार प्रोफ़ाइल जोड़ें', manageContractorsDesc:'ठेकेदार को भुगतान इतिहास देखने के लिए एक प्रोफ़ाइल बनाएं।', cNameLabel:'नाम', cPhoneLabel:'फ़ोन नंबर', cPinLabel:'लॉगिन पिन', saveContractorBtn:'ठेकेदार सेव करें',
@@ -299,6 +305,32 @@
     document.querySelector('[data-theme-toggle]').addEventListener('click', () => { theme = theme === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', theme); });
     applyLang();
 
+    // --- SUPABASE SETUP ---
+    let supabase = null;
+    let currentUser = null;
+
+    async function initSupabase() {
+      try {
+        const res = await fetch('/api/config');
+        const cfg = await res.json();
+        if (cfg.supabaseUrl && cfg.supabaseAnonKey) {
+          supabase = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+          // Check session
+          const { data } = await supabase.auth.getSession();
+          if (data.session) {
+            currentUser = data.session.user;
+            showView('owner-dashboard-view');
+            loadOwnerDashboard();
+          }
+        } else {
+          console.error("Missing Supabase configuration");
+        }
+      } catch (e) {
+        console.error("Could not fetch config:", e);
+      }
+    }
+    initSupabase();
+
     // --- VIEW MANAGEMENT ---
     function showView(viewId) {
       document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
@@ -306,60 +338,76 @@
       document.getElementById('logoutBtn').style.display = (viewId === 'owner-dashboard-view' || viewId === 'contractor-dashboard-view') ? 'inline-flex' : 'none';
     }
 
-    function logout() {
-      ownerSecret = '';
-      contractorToken = null;
-      localStorage.removeItem('ownerSecret');
+    async function logout() {
+      if (supabase && currentUser) {
+        await supabase.auth.signOut();
+        currentUser = null;
+      }
       showView('landing-view');
     }
 
     // --- OWNER LOGIC ---
-    let ownerSecret = localStorage.getItem('ownerSecret') || '';
-    if(ownerSecret) {
-      document.getElementById('ownerPassword').value = ownerSecret;
-      loginOwner(true); // auto login attempt
-    }
-
-    async function loginOwner(silent = false) {
-      const pwd = document.getElementById('ownerPassword').value;
-      if (!pwd) return;
-      try {
-        const res = await fetch(`/api/getSummary?secret=${encodeURIComponent(pwd)}`);
-        if (!res.ok) throw new Error('Invalid Password');
-        const data = await res.json();
-        
-        ownerSecret = pwd;
-        localStorage.setItem('ownerSecret', pwd);
+    async function loginOwner() {
+      if (!supabase) return alert('System initializing...');
+      const email = document.getElementById('ownerEmail').value;
+      const password = document.getElementById('ownerPassword').value;
+      if (!email || !password) return;
+      
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        alert('Login failed: ' + error.message);
+      } else {
+        currentUser = data.user;
         showView('owner-dashboard-view');
-        
-        // Render Summary
-        document.getElementById('valTotalBudget').textContent = `₹${data.totalBudget.toLocaleString('en-IN')}`;
-        document.getElementById('valSpent').textContent = `₹${data.summary.total.toLocaleString('en-IN')}`;
-        document.getElementById('valPending').textContent = `₹${(data.totalBudget - data.summary.total).toLocaleString('en-IN')}`;
-        const burn = data.totalBudget ? Math.round((data.summary.total / data.totalBudget) * 100) : 0;
-        document.getElementById('valBurnBar').style.width = `${burn}%`;
-
-        // Fetch contractors for dropdown
-        fetchContractorsForOwner();
-
-      } catch (e) {
-        if (!silent) alert('Login failed. Please check your password.');
-        ownerSecret = '';
-        localStorage.removeItem('ownerSecret');
+        loadOwnerDashboard();
       }
     }
 
-    async function fetchContractorsForOwner() {
-      try {
-        const res = await fetch('/api/getContractors');
-        if (!res.ok) return;
-        const data = await res.json();
-        document.getElementById('vendorSelect').innerHTML = '<option value="">Select Existing...</option>' + 
-          data.contractors.map(c => `<option value="${c.Name}">${c.Name}</option>`).join('');
-      } catch(e) { console.error(e); }
+    async function signupOwner() {
+      if (!supabase) return alert('System initializing...');
+      const email = document.getElementById('ownerEmail').value;
+      const password = document.getElementById('ownerPassword').value;
+      if (!email || !password) return;
+
+      const { data, error } = await supabase.auth.signUp({ email, password });
+      if (error) {
+        alert('Signup failed: ' + error.message);
+      } else {
+        alert('Signup successful! You can now log in.');
+        loginOwner();
+      }
+    }
+
+    async function loadOwnerDashboard() {
+      if (!supabase || !currentUser) return;
+      
+      // Fetch budget
+      const { data: settings } = await supabase.from('hc_settings').select('*');
+      let totalBudget = 1200000;
+      if (settings) {
+        const bSet = settings.find(s => s.key === 'TOTAL_BUDGET');
+        if (bSet) totalBudget = Number(bSet.value) || totalBudget;
+      }
+
+      // Fetch expenses
+      const { data: expenses } = await supabase.from('hc_expenses').select('*');
+      const totalSpent = (expenses || []).reduce((sum, e) => sum + Number(e.amount), 0);
+
+      document.getElementById('valTotalBudget').textContent = `₹${totalBudget.toLocaleString('en-IN')}`;
+      document.getElementById('valSpent').textContent = `₹${totalSpent.toLocaleString('en-IN')}`;
+      document.getElementById('valPending').textContent = `₹${(totalBudget - totalSpent).toLocaleString('en-IN')}`;
+      
+      const burn = totalBudget ? Math.min(100, Math.round((totalSpent / totalBudget) * 100)) : 0;
+      document.getElementById('valBurnBar').style.width = `${burn}%`;
+
+      // Fetch contractors for dropdown
+      const { data: contractors } = await supabase.from('hc_contractors').select('*');
+      document.getElementById('vendorSelect').innerHTML = '<option value="">Select Existing...</option>' + 
+        (contractors || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
     }
 
     async function saveContractor() {
+      if (!supabase || !currentUser) return;
       const name = document.getElementById('newCName').value;
       const phone = document.getElementById('newCPhone').value;
       const pin = document.getElementById('newCPin').value;
@@ -368,91 +416,77 @@
       const btn = document.getElementById('saveContractorBtn');
       btn.disabled = true; btn.textContent = 'Saving...';
       
-      try {
-        const res = await fetch('/api/addContractor', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({ secret: ownerSecret, name, phone, pin, workType: 'Contractor' })
-        });
-        if (res.ok) {
-          alert('Contractor Saved');
-          document.getElementById('newCName').value = '';
-          document.getElementById('newCPhone').value = '';
-          document.getElementById('newCPin').value = '';
-          fetchContractorsForOwner();
-        } else {
-          alert('Failed to save contractor');
-        }
-      } catch(e) { alert('Error'); }
+      const { error } = await supabase.from('hc_contractors').insert({ name, phone, pin, work_type: 'Contractor', user_id: currentUser.id });
+      
+      if (error) {
+        alert('Failed to save contractor: ' + error.message);
+      } else {
+        alert('Contractor Saved');
+        document.getElementById('newCName').value = '';
+        document.getElementById('newCPhone').value = '';
+        document.getElementById('newCPin').value = '';
+        loadOwnerDashboard(); // refresh dropdown
+      }
       btn.disabled = false; btn.textContent = i18n[lang].saveContractorBtn;
     }
 
     async function saveExpense() {
-      const type = document.getElementById('expType').value;
+      if (!supabase || !currentUser) return;
+      const category = document.getElementById('expType').value;
       const amount = document.getElementById('expAmount').value;
-      const vendor = document.getElementById('vendorSelect').value || document.getElementById('vendorInput').value;
+      const paid_to = document.getElementById('vendorSelect').value || document.getElementById('vendorInput').value;
       const date = document.getElementById('expDate').value || new Date().toISOString().split('T')[0];
-      const notes = document.getElementById('expNotes').value;
+      const description = document.getElementById('expNotes').value || category;
       
-      if (!amount || !vendor || !date) return alert('Amount, Vendor, and Date are required.');
+      if (!amount || !paid_to || !date) return alert('Amount, Vendor, and Date are required.');
 
       const btn = document.getElementById('saveExpenseBtn');
       btn.disabled = true; btn.textContent = 'Saving...';
 
-      let screenshotUrl = '';
+      let screenshot_url = '';
       const fileInput = document.getElementById('expProof');
       if (fileInput.files.length > 0) {
         try {
           const file = fileInput.files[0];
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          await new Promise(r => reader.onload = r);
-          const base64 = reader.result.split(',')[1];
-          const upRes = await fetch(`/api/uploadImage`, {
-            method: 'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({ secret: ownerSecret, imageData: base64, mimeType: file.type, fileName: file.name })
-          });
-          const upData = await upRes.json();
-          if (upData.url) screenshotUrl = upData.url;
+          const path = `${currentUser.id}/${Date.now()}_${file.name}`;
+          const { data, error } = await supabase.storage.from('screenshots').upload(path, file);
+          if (!error && data) {
+            const { data: publicData } = supabase.storage.from('screenshots').getPublicUrl(path);
+            screenshot_url = publicData.publicUrl;
+          }
         } catch(e) { console.error('Image upload failed', e); }
       }
 
-      try {
-        const res = await fetch('/api/addExpense', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({
-            secret: ownerSecret, date, category: type, description: notes || type,
-            amount, paymentMode: 'Cash', paidTo: vendor, paidBy: 'Owner', screenshotUrl
-          })
-        });
-        if (res.ok) {
-          alert('Expense saved');
-          document.getElementById('expAmount').value = '';
-          document.getElementById('expNotes').value = '';
-          document.getElementById('expProof').value = '';
-          loginOwner(true); // refresh summary
-        } else {
-          alert('Failed to save expense');
-        }
-      } catch (e) { alert('Error saving expense'); }
+      const { error } = await supabase.from('hc_expenses').insert({
+        expense_at: date, category, description, amount, payment_mode: 'Cash',
+        paid_to, paid_by: 'Owner', screenshot_url, user_id: currentUser.id
+      });
+      
+      if (error) {
+        alert('Failed to save expense: ' + error.message);
+      } else {
+        alert('Expense saved');
+        document.getElementById('expAmount').value = '';
+        document.getElementById('expNotes').value = '';
+        document.getElementById('expProof').value = '';
+        loadOwnerDashboard(); // refresh summary
+      }
       
       btn.disabled = false; btn.textContent = i18n[lang].saveExpense;
     }
 
     // --- CONTRACTOR LOGIC ---
-    let contractorToken = null;
     async function loginContractor() {
+      const ownerEmail = document.getElementById('contractorOwnerEmail').value;
       const phone = document.getElementById('contractorPhone').value;
       const pin = document.getElementById('contractorPin').value;
-      if(!phone || !pin) return alert('Phone and PIN required');
+      if(!ownerEmail || !phone || !pin) return alert('Owner Email, Phone and PIN required');
 
       try {
         const res = await fetch('/api/contractorAuth', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ phone, pin })
+          body: JSON.stringify({ ownerEmail, phone, pin })
         });
         if(!res.ok) throw new Error('Invalid login');
         const data = await res.json();
@@ -474,7 +508,7 @@
           `).join('');
         }
       } catch(e) {
-        alert('Login failed. Please check phone and PIN.');
+        alert('Login failed. Please check your details.');
       }
     }
   </script>

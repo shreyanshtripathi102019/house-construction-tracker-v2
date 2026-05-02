@@ -2,28 +2,39 @@ import { getSupabase, json, err, sortExpensesDesc } from './_lib.js';
 
 export default async function handler(req, res) {
   try {
+    const ownerEmail = String(req.body?.ownerEmail || '').trim().toLowerCase();
     const phone = String(req.body?.phone || '').trim();
     const pin = String(req.body?.pin || '').trim();
 
-    if (!phone || !pin) return err(res, 'Phone and PIN are required.');
+    if (!ownerEmail || !phone || !pin) return err(res, 'Owner Email, Phone and PIN are required.');
 
-    const sb = getSupabase();
+    const sb = getSupabase(); // initialized with SUPABASE_SERVICE_ROLE_KEY
+
+    // Find Owner ID by email
+    const { data: { users }, error: usersError } = await sb.auth.admin.listUsers();
+    if (usersError) throw usersError;
     
-    // Verify contractor
+    const owner = users.find(u => u.email === ownerEmail);
+    if (!owner) return err(res, 'Owner not found.', 404);
+    const ownerId = owner.id;
+    
+    // Verify contractor belongs to this owner
     const { data: contractor, error: authError } = await sb
       .from('hc_contractors')
       .select('name')
+      .eq('user_id', ownerId)
       .eq('phone', phone)
       .eq('pin', pin)
       .maybeSingle();
       
     if (authError) throw authError;
-    if (!contractor) return err(res, 'Invalid phone number or PIN.', 401);
+    if (!contractor) return err(res, 'Invalid phone number or PIN for this owner.', 401);
 
-    // Fetch payments
+    // Fetch payments for this contractor under this owner
     const { data: payments, error: expError } = await sb
       .from('hc_expenses')
       .select('*')
+      .eq('user_id', ownerId)
       .ilike('paid_to', contractor.name);
 
     if (expError) throw expError;
