@@ -1,0 +1,1222 @@
+<!-- House Construction Tracker V2 - Parallel Track (Supabase + Vercel) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>House Construction Tracker V2</title>
+  <style>
+    :root {
+      --bg: #f6f1e8;
+      --card: #fffaf2;
+      --card-2: #f0e6d8;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #d6c7b4;
+      --primary: #8b5e34;
+      --primary-dark: #6d4724;
+      --accent: #0f766e;
+      --danger: #b33c2f;
+      --success: #2f7d32;
+      --shadow: 0 10px 30px rgba(45, 35, 22, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #f9f4eb 0%, #f3eadf 100%);
+      color: var(--text);
+    }
+
+    .top-banner {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--accent);
+      color: #fff;
+      text-align: center;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      box-shadow: 0 4px 14px rgba(0,0,0,.12);
+    }
+
+    .top-banner span {
+      font-weight: 400;
+      opacity: .92;
+      margin-left: 8px;
+    }
+
+    .app-shell {
+      max-width: 1150px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .header-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand-title {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1.1;
+      color: var(--primary-dark);
+    }
+
+    .brand-subtitle {
+      margin: 8px 0 0;
+      color: var(--muted);
+      max-width: 760px;
+      line-height: 1.5;
+    }
+
+    .badge-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .badge {
+      background: #efe3d0;
+      border: 1px solid #dcc5a5;
+      color: #654321;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 8px 10px;
+      border-radius: 999px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    button, .button-link {
+      border: 0;
+      background: var(--primary);
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: .2s ease;
+    }
+
+    button:hover, .button-link:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #e9ddcb;
+      color: #4b3a29;
+      border: 1px solid #d5c0a7;
+    }
+
+    .btn-secondary:hover {
+      background: #dcc7ad;
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .hero-grid {
+      grid-template-columns: 1.35fr .95fr;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 20px;
+      color: var(--primary-dark);
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .kpi {
+      background: var(--card-2);
+      border: 1px solid #ddc9b3;
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .kpi-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--primary-dark);
+    }
+
+    .route-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .route-card {
+      border: 1px solid #dcc6ad;
+      background: #fff9f1;
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .route-card h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      color: var(--primary-dark);
+    }
+
+    .route-card p {
+      margin: 0 0 14px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .pill-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid #d7c1a8;
+      background: #f4eadc;
+      cursor: pointer;
+      font-weight: 700;
+      color: #5f4631;
+    }
+
+    .pill.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #5a4633;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid #d8c8b4;
+      border-radius: 12px;
+      padding: 12px 13px;
+      font-size: 14px;
+      background: #fffdf9;
+      color: var(--text);
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(15,118,110,.12);
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .full-span {
+      grid-column: 1 / -1;
+    }
+
+    .info-box {
+      background: #eef8f7;
+      border: 1px solid #b8e1dc;
+      color: #155e59;
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-top: 12px;
+    }
+
+    .warning-box {
+      background: #fff6e8;
+      border: 1px solid #efd4a4;
+      color: #845100;
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-top: 12px;
+    }
+
+    .danger-box {
+      background: #fff1ef;
+      border: 1px solid #efc2bc;
+      color: #8d2e24;
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-top: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      overflow: hidden;
+      border-radius: 14px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 12px;
+      border-bottom: 1px solid #eadcc9;
+      font-size: 14px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f3e8d9;
+      color: #5c4630;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .status-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .status-chip {
+      background: #f1e4d1;
+      border: 1px solid #d8bea0;
+      color: #6b4d2e;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 18px;
+    }
+
+    .chart-placeholder {
+      min-height: 220px;
+      border-radius: 16px;
+      border: 1px dashed #cbb292;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.75), rgba(243,232,217,.85)),
+        repeating-linear-gradient(
+          to right,
+          transparent 0,
+          transparent 38px,
+          rgba(139,94,52,.05) 38px,
+          rgba(139,94,52,.05) 39px
+        );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #7b624b;
+      text-align: center;
+      padding: 18px;
+      font-weight: 700;
+    }
+
+    .footer-note {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 24px 0 10px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .two-col,
+      .route-grid,
+      .quick-grid,
+      .form-grid,
+      .form-grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .brand-title {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-banner">
+    Parallel Track V2
+    <span>New repo, new deployment path, new backend path. Existing workflow remains untouched.</span>
+  </div>
+
+  <div class="app-shell">
+    <div class="header-card">
+      <div class="brand-row">
+        <div>
+          <h1 class="brand-title">House Construction Tracker V2</h1>
+          <p class="brand-subtitle">
+            This is the new parallel track for your construction tracker. It preserves the same product direction and route structure, but it is isolated for the new Supabase + Vercel implementation.
+          </p>
+          <div class="badge-row">
+            <div class="badge">Parallel Track</div>
+            <div class="badge">V2 Repo Only</div>
+            <div class="badge">New Backend Path</div>
+            <div class="badge">Existing Flow Untouched</div>
+          </div>
+        </div>
+        <div class="toolbar">
+          <button class="btn-secondary" id="langToggleBtn">हिंदी</button>
+          <button class="btn-outline" id="refreshPreviewBtn">Refresh Preview</button>
+        </div>
+      </div>
+
+      <div class="quick-grid">
+        <div class="kpi">
+          <div class="kpi-label" data-i18n="budgetLabel">Target Budget</div>
+          <div class="kpi-value" id="heroBudget">₹0</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label" data-i18n="spentLabel">Tracked Spend</div>
+          <div class="kpi-value" id="heroSpent">₹0</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label" data-i18n="contractorLabel">Contractor Records</div>
+          <div class="kpi-value" id="heroContractors">0</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label" data-i18n="modeLabel">Mode</div>
+          <div class="kpi-value" style="font-size:18px;">Parallel Preview</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid hero-grid">
+      <div class="card">
+        <h2 class="section-title" data-i18n="routeTitle">Choose a route</h2>
+        <p class="muted" data-i18n="routeText">
+          This preview keeps the same application entry pattern: Home, Contractor, and Owner flows.
+        </p>
+
+        <div class="route-grid">
+          <div class="route-card">
+            <h3 data-i18n="homeView">Home View</h3>
+            <p data-i18n="homeDesc">Landing view for choosing owner or contractor mode.</p>
+            <button onclick="switchView('home')">Open Home</button>
+          </div>
+
+          <div class="route-card">
+            <h3 data-i18n="contractorView">Contractor View</h3>
+            <p data-i18n="contractorDesc">Contractor-friendly preview with payment lookup behavior.</p>
+            <button onclick="switchView('contractor')">Open Contractor</button>
+          </div>
+
+          <div class="route-card">
+            <h3 data-i18n="ownerView">Owner Dashboard</h3>
+            <p data-i18n="ownerDesc">Private dashboard preview for full project control and reporting.</p>
+            <button onclick="switchView('owner')">Open Owner</button>
+          </div>
+        </div>
+
+        <div class="info-box" id="apiStatusBox">
+          Parallel API status: preview mode. This site is intentionally isolated from the current production Apps Script flow.
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title" data-i18n="parallelPlanTitle">Parallel track status</h2>
+        <div class="status-row">
+          <div class="status-chip">New Repo</div>
+          <div class="status-chip">New Site</div>
+          <div class="status-chip">New API Path</div>
+          <div class="status-chip">Supabase Ready</div>
+        </div>
+
+        <div class="warning-box">
+          This `index.html` is safe to use as the first file in the new repo. It is designed as a separate preview shell and does not point to your current live Apps Script endpoint.
+        </div>
+
+        <div class="chart-placeholder" style="margin-top:14px;">
+          Parallel V2 Preview Panel<br />
+          Frontend route shell is ready.<br />
+          Next step: wire new `/api/*` handlers and new Supabase tables.
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px;">
+      <div class="pill-tabs">
+        <div class="pill active" data-tab="home" onclick="switchView('home')">Home</div>
+        <div class="pill" data-tab="contractor" onclick="switchView('contractor')">Contractor</div>
+        <div class="pill" data-tab="owner" onclick="switchView('owner')">Owner</div>
+      </div>
+
+      <div id="view-home" class="view active">
+        <h2 class="section-title" data-i18n="welcomeTitle">Welcome to the V2 parallel track</h2>
+        <p class="muted" data-i18n="welcomeText">
+          This page recreates the same top-level product structure while keeping the implementation fully separated from the old workflow.
+        </p>
+
+        <div class="two-col" style="margin-top:18px;">
+          <div class="card">
+            <h3 style="margin-top:0;" data-i18n="contractorCardTitle">Contractor entry</h3>
+            <p class="muted" data-i18n="contractorCardText">
+              Simple payment lookup for contractor-facing usage, with Hindi-first behavior in the original product direction.
+            </p>
+            <button onclick="switchView('contractor')">Go to Contractor View</button>
+          </div>
+
+          <div class="card">
+            <h3 style="margin-top:0;" data-i18n="ownerCardTitle">Owner entry</h3>
+            <p class="muted" data-i18n="ownerCardText">
+              Password-gated dashboard area for expenses, settings, ledger, and overview controls.
+            </p>
+            <button onclick="switchView('owner')">Go to Owner Dashboard</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="view-contractor" class="view">
+        <h2 class="section-title" data-i18n="contractorPageTitle">Contractor payment view</h2>
+        <p class="muted" data-i18n="contractorPageText">
+          This is the contractor-side preview for the parallel track.
+        </p>
+
+        <div class="form-grid" style="margin-top:16px;">
+          <div>
+            <label data-i18n="contractorNameLabel">Contractor name</label>
+            <select id="contractorSelect">
+              <option value="">Select contractor</option>
+            </select>
+          </div>
+          <div>
+            <label data-i18n="contractorLanguageLabel">Preferred language</label>
+            <select id="contractorLanguageSelect">
+              <option value="hi">Hindi</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+          <button id="loadContractorBtn">Load Contractor Payments</button>
+          <button class="btn-secondary" onclick="switchLanguage('hi')">हिंदी</button>
+          <button class="btn-secondary" onclick="switchLanguage('en')">English</button>
+        </div>
+
+        <div class="quick-grid" style="margin-top:18px;">
+          <div class="kpi">
+            <div class="kpi-label" data-i18n="receivedLabel">Total received</div>
+            <div class="kpi-value" id="contractorReceived">₹0</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label" data-i18n="recordsLabel">Payment records</div>
+            <div class="kpi-value" id="contractorRecords">0</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label" data-i18n="proofLabel">Proof links</div>
+            <div class="kpi-value" id="contractorProofCount">0</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label" data-i18n="statusLabel">Status</div>
+            <div class="kpi-value" style="font-size:18px;">Preview</div>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th data-i18n="dateColumn">Date</th>
+              <th data-i18n="amountColumn">Amount</th>
+              <th data-i18n="descriptionColumn">Description</th>
+              <th data-i18n="proofColumn">Proof</th>
+            </tr>
+          </thead>
+          <tbody id="contractorPaymentsBody">
+            <tr>
+              <td colspan="4" class="muted">No data loaded yet from the new parallel API.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="view-owner" class="view">
+        <h2 class="section-title" data-i18n="ownerPageTitle">Owner dashboard preview</h2>
+        <p class="muted" data-i18n="ownerPageText">
+          This keeps the same owner-first control direction for budget, expenses, history, and ledger.
+        </p>
+
+        <div class="two-col" style="margin-top:18px;">
+          <div class="card">
+            <h3 style="margin-top:0;" data-i18n="ownerLoginTitle">Owner login</h3>
+            <div class="form-grid">
+              <div class="full-span">
+                <label data-i18n="passwordLabel">Owner password</label>
+                <input type="password" id="ownerPassword" placeholder="Enter owner password for new track" />
+              </div>
+            </div>
+            <div style="margin-top:14px;">
+              <button id="ownerLoginBtn">Unlock Preview</button>
+            </div>
+            <div class="info-box" id="ownerLoginStatus" style="margin-top:14px;">
+              Owner auth for the parallel track will use the new `/api/owner-login` route.
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 style="margin-top:0;" data-i18n="dashboardSummaryTitle">Dashboard summary</h3>
+            <div class="quick-grid" style="grid-template-columns:repeat(2,minmax(0,1fr)); margin-top:0;">
+              <div class="kpi">
+                <div class="kpi-label">Total Budget</div>
+                <div class="kpi-value" id="sumBudget">₹0</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-label">Total Spent</div>
+                <div class="kpi-value" id="sumSpent">₹0</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-label">Work Payments</div>
+                <div class="kpi-value" id="sumWork">₹0</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-label">Lalu Balance</div>
+                <div class="kpi-value" id="sumLalu">₹0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pill-tabs" style="margin-top:18px;">
+          <div class="pill active" data-owner-tab="expenses" onclick="switchOwnerTab('expenses')">Expenses</div>
+          <div class="pill" data-owner-tab="history" onclick="switchOwnerTab('history')">History</div>
+          <div class="pill" data-owner-tab="ledger" onclick="switchOwnerTab('ledger')">Lalu Ledger</div>
+          <div class="pill" data-owner-tab="settings" onclick="switchOwnerTab('settings')">Settings</div>
+        </div>
+
+        <div id="owner-tab-expenses" class="owner-tab">
+          <div class="card">
+            <h3 style="margin-top:0;">Add expense</h3>
+            <div class="form-grid-3">
+              <div>
+                <label>Date</label>
+                <input type="date" id="expenseDate" />
+              </div>
+              <div>
+                <label>Time</label>
+                <input type="time" id="expenseTime" />
+              </div>
+              <div>
+                <label>Amount</label>
+                <input type="number" id="expenseAmount" placeholder="Enter amount" />
+              </div>
+
+              <div>
+                <label>Category</label>
+                <select id="expenseCategory">
+                  <option>Material</option>
+                  <option>Contractor</option>
+                  <option>Equipment</option>
+                  <option>Miscellaneous</option>
+                  <option>Advance</option>
+                </select>
+              </div>
+              <div>
+                <label>Payment mode</label>
+                <select id="expensePaymentMode">
+                  <option>Cash</option>
+                  <option>UPI</option>
+                  <option>Bank Transfer</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div>
+                <label>Paid by</label>
+                <select id="expensePaidBy">
+                  <option>Shreyansh</option>
+                  <option>Rajesh</option>
+                  <option>Lalu</option>
+                </select>
+              </div>
+
+              <div>
+                <label>Entry type</label>
+                <select id="expenseEntryKind">
+                  <option>DirectExpense</option>
+                  <option>AdvanceGiven</option>
+                  <option>AdvanceSettlement</option>
+                </select>
+              </div>
+              <div>
+                <label>Advance holder</label>
+                <select id="expenseAdvanceParty">
+                  <option value="">Select if applicable</option>
+                  <option>Lalu</option>
+                </select>
+              </div>
+              <div>
+                <label>Paid to</label>
+                <input type="text" id="expensePaidTo" placeholder="Contractor / vendor / person" />
+              </div>
+
+              <div class="full-span">
+                <label>Description</label>
+                <textarea id="expenseDescription" placeholder="Describe this expense"></textarea>
+              </div>
+
+              <div class="full-span">
+                <label>Bill / screenshot</label>
+                <input type="file" id="expenseScreenshot" />
+              </div>
+            </div>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
+              <button id="saveExpenseBtn">Save Expense</button>
+              <button class="btn-secondary" id="clearExpenseBtn">Clear</button>
+              <button class="btn-secondary hidden" id="cancelEditBtn">Cancel Edit</button>
+              <button class="btn-danger hidden" id="deleteExpenseBtn">Delete</button>
+            </div>
+
+            <div class="info-box" id="expenseActionStatus" style="margin-top:14px;">
+              Expense actions in V2 will use the new `/api/expenses` route.
+            </div>
+          </div>
+        </div>
+
+        <div id="owner-tab-history" class="owner-tab hidden">
+          <div class="card">
+            <h3 style="margin-top:0;">Recent expenses</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Category</th>
+                  <th>Amount</th>
+                  <th>Paid To</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody">
+                <tr>
+                  <td colspan="5" class="muted">History will load from the new parallel `/api/expenses` endpoint.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="owner-tab-ledger" class="owner-tab hidden">
+          <div class="card">
+            <h3 style="margin-top:0;">Lalu advance ledger</h3>
+            <div class="quick-grid" style="grid-template-columns:repeat(3,minmax(0,1fr));">
+              <div class="kpi">
+                <div class="kpi-label">Advance Given</div>
+                <div class="kpi-value" id="ledgerAdvanceGiven">₹0</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-label">Paid by Lalu</div>
+                <div class="kpi-value" id="ledgerPaidByLalu">₹0</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-label">Running Balance</div>
+                <div class="kpi-value" id="ledgerBalance">₹0</div>
+              </div>
+            </div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody id="ledgerTableBody">
+                <tr>
+                  <td colspan="4" class="muted">Ledger preview will populate from the new summary/expenses API.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="owner-tab-settings" class="owner-tab hidden">
+          <div class="card">
+            <h3 style="margin-top:0;">Settings</h3>
+            <div class="form-grid">
+              <div>
+                <label>Total budget</label>
+                <input type="number" id="settingsBudget" placeholder="Set total budget" />
+              </div>
+              <div>
+                <label>Contractor name</label>
+                <input type="text" id="settingsContractorName" placeholder="Enter contractor name" />
+              </div>
+              <div>
+                <label>Phone</label>
+                <input type="text" id="settingsContractorPhone" placeholder="Enter phone number" />
+              </div>
+              <div>
+                <label>Work type</label>
+                <input type="text" id="settingsWorkType" placeholder="Masonry / plumbing / etc." />
+              </div>
+              <div>
+                <label>Agreed amount</label>
+                <input type="number" id="settingsAgreedAmount" placeholder="Enter agreed amount" />
+              </div>
+            </div>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
+              <button id="saveBudgetBtn">Save Budget</button>
+              <button class="btn-secondary" id="addContractorBtn">Add Contractor</button>
+            </div>
+
+            <div class="info-box" id="settingsStatus" style="margin-top:14px;">
+              Settings actions in V2 will use new API routes such as `/api/settings/budget` and `/api/contractors`.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      House Construction Tracker V2 preview · New repo only · New deployment only · Existing workflow untouched
+    </div>
+  </div>
+
+  <script>
+    const CONFIG = {
+      apiBase: "/api",
+      mode: "parallel-v2",
+      preserveExistingWorkflow: true
+    };
+
+    const state = {
+      lang: "en",
+      view: "home",
+      ownerTab: "expenses",
+      contractors: [],
+      summary: null,
+      contractorPayments: []
+    };
+
+    const translations = {
+      en: {
+        budgetLabel: "Target Budget",
+        spentLabel: "Tracked Spend",
+        contractorLabel: "Contractor Records",
+        modeLabel: "Mode",
+        routeTitle: "Choose a route",
+        routeText: "This preview keeps the same application entry pattern: Home, Contractor, and Owner flows.",
+        homeView: "Home View",
+        homeDesc: "Landing view for choosing owner or contractor mode.",
+        contractorView: "Contractor View",
+        contractorDesc: "Contractor-friendly preview with payment lookup behavior.",
+        ownerView: "Owner Dashboard",
+        ownerDesc: "Private dashboard preview for full project control and reporting.",
+        parallelPlanTitle: "Parallel track status",
+        welcomeTitle: "Welcome to the V2 parallel track",
+        welcomeText: "This page recreates the same top-level product structure while keeping the implementation fully separated from the old workflow.",
+        contractorCardTitle: "Contractor entry",
+        contractorCardText: "Simple payment lookup for contractor-facing usage, with Hindi-first behavior in the original product direction.",
+        ownerCardTitle: "Owner entry",
+        ownerCardText: "Password-gated dashboard area for expenses, settings, ledger, and overview controls.",
+        contractorPageTitle: "Contractor payment view",
+        contractorPageText: "This is the contractor-side preview for the parallel track.",
+        contractorNameLabel: "Contractor name",
+        contractorLanguageLabel: "Preferred language",
+        receivedLabel: "Total received",
+        recordsLabel: "Payment records",
+        proofLabel: "Proof links",
+        statusLabel: "Status",
+        dateColumn: "Date",
+        amountColumn: "Amount",
+        descriptionColumn: "Description",
+        proofColumn: "Proof",
+        ownerPageTitle: "Owner dashboard preview",
+        ownerPageText: "This keeps the same owner-first control direction for budget, expenses, history, and ledger.",
+        ownerLoginTitle: "Owner login",
+        passwordLabel: "Owner password",
+        dashboardSummaryTitle: "Dashboard summary"
+      },
+      hi: {
+        budgetLabel: "लक्ष्य बजट",
+        spentLabel: "दर्ज खर्च",
+        contractorLabel: "ठेकेदार रिकॉर्ड",
+        modeLabel: "मोड",
+        routeTitle: "रास्ता चुनें",
+        routeText: "यह प्रीव्यू वही एंट्री पैटर्न रखता है: होम, ठेकेदार और मालिक व्यू।",
+        homeView: "होम व्यू",
+        homeDesc: "मालिक या ठेकेदार मोड चुनने के लिए लैंडिंग व्यू।",
+        contractorView: "ठेकेदार व्यू",
+        contractorDesc: "ठेकेदार के लिए सरल पेमेंट व्यू।",
+        ownerView: "मालिक डैशबोर्ड",
+        ownerDesc: "पूरे प्रोजेक्ट नियंत्रण और रिपोर्टिंग के लिए निजी डैशबोर्ड।",
+        parallelPlanTitle: "पैरेलल ट्रैक स्थिति",
+        welcomeTitle: "V2 पैरेलल ट्रैक में आपका स्वागत है",
+        welcomeText: "यह पेज पुरानी workflow को छुए बिना उसी प्रोडक्ट दिशा को अलग implementation के साथ दिखाता है।",
+        contractorCardTitle: "ठेकेदार प्रवेश",
+        contractorCardText: "ठेकेदार उपयोग के लिए सरल पेमेंट लुकअप, मूल उत्पाद दिशा के अनुसार हिंदी-फर्स्ट व्यवहार के साथ।",
+        ownerCardTitle: "मालिक प्रवेश",
+        ownerCardText: "खर्च, सेटिंग, लेजर और ओवरव्यू नियंत्रण के लिए पासवर्ड-सुरक्षित डैशबोर्ड क्षेत्र।",
+        contractorPageTitle: "ठेकेदार भुगतान व्यू",
+        contractorPageText: "यह पैरेलल ट्रैक का ठेकेदार-साइड प्रीव्यू है।",
+        contractorNameLabel: "ठेकेदार का नाम",
+        contractorLanguageLabel: "पसंदीदा भाषा",
+        receivedLabel: "कुल प्राप्त",
+        recordsLabel: "भुगतान रिकॉर्ड",
+        proofLabel: "प्रूफ लिंक",
+        statusLabel: "स्थिति",
+        dateColumn: "तारीख",
+        amountColumn: "राशि",
+        descriptionColumn: "विवरण",
+        proofColumn: "प्रूफ",
+        ownerPageTitle: "मालिक डैशबोर्ड प्रीव्यू",
+        ownerPageText: "यह बजट, खर्च, हिस्ट्री और लेजर के लिए वही मालिक-केंद्रित दिशा रखता है।",
+        ownerLoginTitle: "मालिक लॉगिन",
+        passwordLabel: "मालिक पासवर्ड",
+        dashboardSummaryTitle: "डैशबोर्ड सारांश"
+      }
+    };
+
+    function formatCurrency(value) {
+      const num = Number(value || 0);
+      return "₹" + num.toLocaleString("en-IN");
+    }
+
+    function switchView(view) {
+      state.view = view;
+      document.querySelectorAll(".view").forEach(el => el.classList.remove("active"));
+      const target = document.getElementById(`view-${view}`);
+      if (target) target.classList.add("active");
+
+      document.querySelectorAll("[data-tab]").forEach(el => {
+        el.classList.toggle("active", el.getAttribute("data-tab") === view);
+      });
+    }
+
+    function switchOwnerTab(tab) {
+      state.ownerTab = tab;
+      document.querySelectorAll("[data-owner-tab]").forEach(el => {
+        el.classList.toggle("active", el.getAttribute("data-owner-tab") === tab);
+      });
+      document.querySelectorAll(".owner-tab").forEach(el => el.classList.add("hidden"));
+      const target = document.getElementById(`owner-tab-${tab}`);
+      if (target) target.classList.remove("hidden");
+    }
+
+    function switchLanguage(lang) {
+      state.lang = lang;
+      applyTranslations();
+      document.getElementById("langToggleBtn").textContent = lang === "en" ? "हिंदी" : "English";
+    }
+
+    function applyTranslations() {
+      const dict = translations[state.lang] || translations.en;
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (dict[key]) el.textContent = dict[key];
+      });
+    }
+
+    async function fetchJson(path, options = {}) {
+      try {
+        const response = await fetch(`${CONFIG.apiBase}${path}`, options);
+        return await response.json();
+      } catch (error) {
+        return { ok: false, error: error.message || "network_error" };
+      }
+    }
+
+    async function loadSummary() {
+      const data = await fetchJson("/summary");
+      if (data && data.ok && data.totals) {
+        state.summary = data;
+        document.getElementById("heroBudget").textContent = formatCurrency(data.totals.totalBudget);
+        document.getElementById("heroSpent").textContent = formatCurrency(data.totals.totalSpent);
+        document.getElementById("sumBudget").textContent = formatCurrency(data.totals.totalBudget);
+        document.getElementById("sumSpent").textContent = formatCurrency(data.totals.totalSpent);
+        document.getElementById("sumWork").textContent = formatCurrency(data.totals.workPayments);
+        document.getElementById("sumLalu").textContent = formatCurrency(data.totals.laluAdvanceBalance);
+        document.getElementById("ledgerBalance").textContent = formatCurrency(data.totals.laluAdvanceBalance);
+        document.getElementById("apiStatusBox").textContent = "Parallel API status: summary endpoint connected to the new track.";
+      } else {
+        document.getElementById("apiStatusBox").textContent = "Parallel API status: summary endpoint not wired yet. Preview shell is still safe and isolated.";
+      }
+    }
+
+    async function loadContractors() {
+      const data = await fetchJson("/contractors");
+      const select = document.getElementById("contractorSelect");
+      select.innerHTML = '<option value="">Select contractor</option>';
+      if (data && data.ok && Array.isArray(data.data)) {
+        state.contractors = data.data;
+        document.getElementById("heroContractors").textContent = String(data.data.length);
+        data.data.forEach(item => {
+          const option = document.createElement("option");
+          option.value = item.name || "";
+          option.textContent = item.name || "Unnamed";
+          select.appendChild(option);
+        });
+      }
+    }
+
+    async function loadContractorPayments() {
+      const name = document.getElementById("contractorSelect").value;
+      if (!name) return;
+
+      const data = await fetchJson(`/contractor-payments?name=${encodeURIComponent(name)}`);
+      const body = document.getElementById("contractorPaymentsBody");
+      body.innerHTML = "";
+
+      if (!(data && data.ok && Array.isArray(data.payments))) {
+        body.innerHTML = '<tr><td colspan="4" class="muted">Could not load contractor payments from the new track yet.</td></tr>';
+        return;
+      }
+
+      const payments = data.payments || [];
+      const total = payments.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+      const proofCount = payments.filter(row => row.screenshot_url).length;
+
+      document.getElementById("contractorReceived").textContent = formatCurrency(total);
+      document.getElementById("contractorRecords").textContent = String(payments.length);
+      document.getElementById("contractorProofCount").textContent = String(proofCount);
+
+      if (!payments.length) {
+        body.innerHTML = '<tr><td colspan="4" class="muted">No contractor payments found in the new track.</td></tr>';
+        return;
+      }
+
+      payments.forEach(row => {
+        const tr = document.createElement("tr");
+        const proof = row.screenshot_url
+          ? `<a href="${row.screenshot_url}" target="_blank" rel="noopener noreferrer">Open</a>`
+          : "—";
+        tr.innerHTML = `
+          <td>${row.expense_at ? new Date(row.expense_at).toLocaleDateString("en-IN") : "—"}</td>
+          <td>${formatCurrency(row.amount)}</td>
+          <td>${row.description || "—"}</td>
+          <td>${proof}</td>
+        `;
+        body.appendChild(tr);
+      });
+    }
+
+    async function ownerLogin() {
+      const password = document.getElementById("ownerPassword").value;
+      const result = await fetchJson("/owner-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password })
+      });
+
+      const box = document.getElementById("ownerLoginStatus");
+      if (result && result.ok) {
+        box.textContent = "Owner authenticated against the new parallel track.";
+        box.className = "info-box";
+      } else {
+        box.textContent = "Owner authentication not complete yet for this preview or the password is invalid in the new track.";
+        box.className = "danger-box";
+      }
+    }
+
+    function setDefaultDateTime() {
+      const now = new Date();
+      const date = now.toISOString().slice(0, 10);
+      const time = now.toTimeString().slice(0, 5);
+      document.getElementById("expenseDate").value = date;
+      document.getElementById("expenseTime").value = time;
+    }
+
+    function clearExpenseForm() {
+      document.getElementById("expenseAmount").value = "";
+      document.getElementById("expenseDescription").value = "";
+      document.getElementById("expensePaidTo").value = "";
+      document.getElementById("expenseScreenshot").value = "";
+      setDefaultDateTime();
+    }
+
+    async function saveExpensePreview() {
+      const payload = {
+        expense_at: `${document.getElementById("expenseDate").value}T${document.getElementById("expenseTime").value}:00`,
+        amount: Number(document.getElementById("expenseAmount").value || 0),
+        category: document.getElementById("expenseCategory").value,
+        payment_mode: document.getElementById("expensePaymentMode").value,
+        paid_by: document.getElementById("expensePaidBy").value,
+        entry_kind: document.getElementById("expenseEntryKind").value,
+        advance_party: document.getElementById("expenseAdvanceParty").value || null,
+        paid_to: document.getElementById("expensePaidTo").value,
+        description: document.getElementById("expenseDescription").value
+      };
+
+      const result = await fetchJson("/expenses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const box = document.getElementById("expenseActionStatus");
+      if (result && result.ok) {
+        box.textContent = "Expense saved in the new parallel track.";
+        box.className = "info-box";
+        clearExpenseForm();
+        loadSummary();
+      } else {
+        box.textContent = "Expense save is not fully wired yet for this parallel preview.";
+        box.className = "warning-box";
+      }
+    }
+
+    async function loadHistoryPreview() {
+      const result = await fetchJson("/expenses");
+      const body = document.getElementById("historyTableBody");
+      body.innerHTML = "";
+
+      if (!(result && result.ok && Array.isArray(result.data))) {
+        body.innerHTML = '<tr><td colspan="5" class="muted">Could not load history from the new track yet.</td></tr>';
+        return;
+      }
+
+      const rows = result.data.slice(0, 10);
+      if (!rows.length) {
+        body.innerHTML = '<tr><td colspan="5" class="muted">No expense history found in the new track.</td></tr>';
+        return;
+      }
+
+      rows.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row.expense_at ? new Date(row.expense_at).toLocaleString("en-IN") : "—"}</td>
+          <td>${row.category || "—"}</td>
+          <td>${formatCurrency(row.amount)}</td>
+          <td>${row.paid_to || "—"}</td>
+          <td>${row.description || "—"}</td>
+        `;
+        body.appendChild(tr);
+      });
+    }
+
+    document.getElementById("langToggleBtn").addEventListener("click", () => {
+      switchLanguage(state.lang === "en" ? "hi" : "en");
+    });
+
+    document.getElementById("refreshPreviewBtn").addEventListener("click", async () => {
+      await loadSummary();
+      await loadContractors();
+      await loadHistoryPreview();
+    });
+
+    document.getElementById("loadContractorBtn").addEventListener("click", loadContractorPayments);
+    document.getElementById("ownerLoginBtn").addEventListener("click", ownerLogin);
+    document.getElementById("saveExpenseBtn").addEventListener("click", saveExpensePreview);
+    document.getElementById("clearExpenseBtn").addEventListener("click", clearExpenseForm);
+
+    switchLanguage("en");
+    switchView("home");
+    switchOwnerTab("expenses");
+    setDefaultDateTime();
+    loadSummary();
+    loadContractors();
+    loadHistoryPreview();
+  </script>
+</body>
+</html>
