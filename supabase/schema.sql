@@ -6,6 +6,7 @@ CREATE TABLE public.hc_contractors (
   created_at TIMESTAMPTZ DEFAULT now(),
   name TEXT NOT NULL,
   phone TEXT,
+  pin TEXT,
   work_type TEXT,
   agreed_amount NUMERIC DEFAULT 0
 );
