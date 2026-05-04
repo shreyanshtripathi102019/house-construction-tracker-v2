@@ -121,11 +121,11 @@
         <p class="lead" data-i18n="landingLead">Please select your role to continue securely.</p>
       </div>
       <div class="landing-split">
-        <div class="role-card" onclick="showView('owner-auth-view')">
+        <div class="role-card" id="btn-owner">
           <h2 data-i18n="roleOwner">Owner</h2>
           <p class="tiny" data-i18n="roleOwnerDesc">Manage budget, track expenses, and oversee contractors.</p>
         </div>
-        <div class="role-card" onclick="showView('contractor-auth-view')">
+        <div class="role-card" id="btn-contractor">
           <h2 data-i18n="roleContractor">Contractor</h2>
           <p class="tiny" data-i18n="roleContractorDesc">View your payments and project balance.</p>
         </div>
@@ -263,6 +263,11 @@
   </main>
 
   <script>
+    window.onerror = function(msg, url, line) {
+      console.error("Global Error:", msg, "Line:", line);
+      // alert("Error: " + msg + "\nLine: " + line); // Uncomment for extreme debugging
+    };
+
     const i18n = {
       en: {
         landingTitle:'House Construction Tracker', landingLead:'Select your role to continue securely.',
@@ -333,10 +338,32 @@
 
     // --- VIEW MANAGEMENT ---
     function showView(viewId) {
-      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-      document.getElementById(viewId).classList.add('active');
-      document.getElementById('logoutBtn').style.display = (viewId === 'owner-dashboard-view' || viewId === 'contractor-dashboard-view') ? 'inline-flex' : 'none';
+      try {
+        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+        const targetView = document.getElementById(viewId);
+        if (targetView) {
+          targetView.classList.add('active');
+        } else {
+          console.error("View not found:", viewId);
+        }
+        
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+          logoutBtn.style.display = (viewId === 'owner-dashboard-view' || viewId === 'contractor-dashboard-view') ? 'inline-flex' : 'none';
+        }
+      } catch (e) {
+        console.error("showView Error:", e);
+      }
     }
+
+    // Attach Event Listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      const ownerBtn = document.getElementById('btn-owner');
+      if (ownerBtn) ownerBtn.addEventListener('click', () => showView('owner-auth-view'));
+      
+      const contractorBtn = document.getElementById('btn-contractor');
+      if (contractorBtn) contractorBtn.addEventListener('click', () => showView('contractor-auth-view'));
+    });
 
     async function logout() {
       if (supabase && currentUser) {
