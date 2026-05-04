@@ -357,13 +357,11 @@
     }
 
     // Attach Event Listeners
-    document.addEventListener('DOMContentLoaded', () => {
-      const ownerBtn = document.getElementById('btn-owner');
-      if (ownerBtn) ownerBtn.addEventListener('click', () => showView('owner-auth-view'));
-      
-      const contractorBtn = document.getElementById('btn-contractor');
-      if (contractorBtn) contractorBtn.addEventListener('click', () => showView('contractor-auth-view'));
-    });
+    const ownerBtn = document.getElementById('btn-owner');
+    if (ownerBtn) ownerBtn.addEventListener('click', () => showView('owner-auth-view'));
+    
+    const contractorBtn = document.getElementById('btn-contractor');
+    if (contractorBtn) contractorBtn.addEventListener('click', () => showView('contractor-auth-view'));
 
     async function logout() {
       if (supabase && currentUser) {
