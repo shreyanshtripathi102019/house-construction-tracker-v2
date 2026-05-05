@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>House Construction Tracker</title>
-  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=zodiak@400,700&display=swap" rel="stylesheet">
+  <title>ARIT Nirmaan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root, [data-theme="light"] {
@@ -14,10 +16,10 @@
       --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
       --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
       --space-1: .25rem; --space-2: .5rem; --space-3: .75rem; --space-4: 1rem; --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem; --space-16: 4rem;
-      --color-bg:#f7f6f2; --color-surface:#f9f8f5; --color-surface-2:#fbfbf9; --color-border:#d4d1ca; --color-divider:#dcd9d5; --color-text:#28251d; --color-text-muted:#67655f; --color-text-faint:#9e9b95; --color-primary:#01696f; --color-primary-hover:#0c4e54; --color-primary-highlight:#cedcd8; --color-success:#437a22; --color-warning:#964219; --color-error:#a12c7b; --color-text-inverse:#f9f8f4; --radius-sm:.375rem; --radius-md:.5rem; --radius-lg:.75rem; --radius-xl:1rem; --shadow-sm:0 1px 2px rgba(0,0,0,.06); --shadow-md:0 8px 24px rgba(0,0,0,.08); --font-body:'Satoshi', sans-serif; --font-display:'Zodiak', serif;
+      --color-bg:#fafafa; --color-surface:#ffffff; --color-surface-2:#f4f4f5; --color-border:#e4e4e7; --color-divider:#e4e4e7; --color-text:#18181b; --color-text-muted:#71717a; --color-text-faint:#a1a1aa; --color-primary:#18181b; --color-primary-hover:#000000; --color-primary-highlight:#e4e4e7; --color-success:#16a34a; --color-warning:#ea580c; --color-error:#dc2626; --color-text-inverse:#ffffff; --radius-sm:.375rem; --radius-md:.5rem; --radius-lg:.75rem; --radius-btn:9999px; --radius-xl:1.25rem; --shadow-sm:0 1px 2px rgba(0,0,0,.05); --shadow-md:0 10px 30px rgba(0,0,0,.08); --font-body:'Inter', sans-serif; --font-display:'Manrope', sans-serif;
     }
     [data-theme="dark"] {
-      --color-bg:#171614; --color-surface:#1c1b19; --color-surface-2:#201f1d; --color-border:#393836; --color-divider:#262523; --color-text:#cdccca; --color-text-muted:#a6a39d; --color-text-faint:#6c6963; --color-primary:#4f98a3; --color-primary-hover:#227f8b; --color-primary-highlight:#313b3b; --color-success:#6daa45; --color-warning:#bb653b; --color-error:#d163a7; --color-text-inverse:#171614; --shadow-sm:0 1px 2px rgba(0,0,0,.2); --shadow-md:0 8px 24px rgba(0,0,0,.3);
+      --color-bg:#09090b; --color-surface:#18181b; --color-surface-2:#27272a; --color-border:#3f3f46; --color-divider:#27272a; --color-text:#f4f4f5; --color-text-muted:#a1a1aa; --color-text-faint:#71717a; --color-primary:#ffffff; --color-primary-hover:#f4f4f5; --color-primary-highlight:#27272a; --color-success:#22c55e; --color-warning:#f97316; --color-error:#ef4444; --color-text-inverse:#09090b; --shadow-sm:0 1px 2px rgba(0,0,0,.3); --shadow-md:0 10px 30px rgba(0,0,0,.5);
     }
     *{box-sizing:border-box;margin:0;padding:0}
     html{-webkit-text-size-adjust:none;text-size-adjust:none;scroll-behavior:smooth}
@@ -34,13 +36,13 @@
     .nav-actions{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
     .theme-toggle,.lang-toggle{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:.65rem .9rem;border:1px solid var(--color-border);border-radius:999px;background:var(--color-surface)}
     main{padding:var(--space-8) 0 var(--space-16); flex:1;}
-    h1,h2,h3{font-family:var(--font-display);line-height:1.12}
+    h1,h2,h3{font-family:var(--font-display);line-height:1.12;letter-spacing:-0.02em}
     h1{font-size:var(--text-xl)}
     h2{font-size:clamp(1.25rem,1rem + 1vw,2rem)}
     h3{font-size:1.15rem}
     .lead{margin-top:var(--space-4);color:var(--color-text-muted)}
     
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:44px;padding:.85rem 1.1rem;border-radius:var(--radius-lg);font-weight:700;transition:.18s ease}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:44px;padding:.85rem 1.4rem;border-radius:var(--radius-btn);font-weight:600;font-size:var(--text-sm);letter-spacing:0.01em;transition:.18s ease}
     .btn-primary{background:var(--color-primary);color:var(--color-text-inverse)}
     .btn-primary:hover{background:var(--color-primary-hover)}
     .btn-secondary{background:var(--color-surface-2);border:1px solid var(--color-border)}
@@ -96,13 +98,13 @@
   <header>
     <div class="container nav">
       <div class="brand" onclick="showView('landing-view')">
-        <svg viewBox="0 0 64 64" fill="none">
-          <path d="M10 30 32 12l22 18" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M18 28v22h28V28" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M28 50V37h8v13" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <svg width="28" height="28" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-arit-graphite" aria-label="ARIT logo">
+          <path d="M17 80L47 15L79 80" stroke="currentColor" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"></path>
+          <path d="M35 57L58 50" stroke="currentColor" stroke-width="9" stroke-linecap="round"></path>
+          <path d="M52 60L69 77L58 80Z" fill="#C5B358"></path>
         </svg>
         <div>
-          <div>House Tracker</div>
+          <div>ARIT Nirmaan</div>
         </div>
       </div>
       <div class="nav-actions">
@@ -117,7 +119,7 @@
     <!-- LANDING VIEW -->
     <section id="landing-view" class="view-section active">
       <div style="text-align:center; max-width:600px; margin:0 auto;">
-        <h1 data-i18n="landingTitle">Welcome to the Construction Tracker</h1>
+        <h1 data-i18n="landingTitle">ARIT Nirmaan</h1>
         <p class="lead" data-i18n="landingLead">Please select your role to continue securely.</p>
       </div>
       <div class="landing-split">
@@ -264,13 +266,23 @@
 
   <script>
     window.onerror = function(msg, url, line) {
-      console.error("Global Error:", msg, "Line:", line);
-      // alert("Error: " + msg + "\nLine: " + line); // Uncomment for extreme debugging
+      alert("Error: " + msg + "\nLine: " + line); 
     };
+
+    // Attach Event Listeners FIRST so nothing can block them
+    try {
+      const ownerBtn = document.getElementById('btn-owner');
+      if (ownerBtn) ownerBtn.addEventListener('click', () => showView('owner-auth-view'));
+      
+      const contractorBtn = document.getElementById('btn-contractor');
+      if (contractorBtn) contractorBtn.addEventListener('click', () => showView('contractor-auth-view'));
+    } catch(e) {
+      alert("Error attaching clicks: " + e.message);
+    }
 
     const i18n = {
       en: {
-        landingTitle:'House Construction Tracker', landingLead:'Select your role to continue securely.',
+        landingTitle:'ARIT Nirmaan', landingLead:'Select your role to continue securely.',
         roleOwner:'Owner', roleOwnerDesc:'Manage budget, track expenses, and oversee contractors.',
         roleContractor:'Contractor', roleContractorDesc:'View your payments and project balance.',
         ownerAuthTitle:'Owner Login', ownerAuthDesc:'Sign in or create an account.', signupBtn:'Sign Up', cancelBtn:'Cancel',
@@ -281,7 +293,7 @@
         cDashLead:'Here is the history of payments recorded for your work.', thDate:'Date', thWork:'Work/Notes', thAmount:'Amount', thStatus:'Status', paid:'Paid'
       },
       hi: {
-        landingTitle:'घर निर्माण ट्रैकर', landingLead:'सुरक्षित रूप से आगे बढ़ने के लिए अपनी भूमिका चुनें।',
+        landingTitle:'अरित निर्माण', landingLead:'सुरक्षित रूप से आगे बढ़ने के लिए अपनी भूमिका चुनें।',
         roleOwner:'मालिक (Owner)', roleOwnerDesc:'बजट प्रबंधित करें, खर्च ट्रैक करें और ठेकेदारों को देखें।',
         roleContractor:'ठेकेदार (Contractor)', roleContractorDesc:'अपने भुगतान और प्रोजेक्ट बैलेंस देखें।',
         ownerAuthTitle:'मालिक लॉगिन', ownerAuthDesc:'साइन इन करें या खाता बनाएं।', signupBtn:'साइन अप करें', cancelBtn:'रद्द करें',
@@ -355,13 +367,6 @@
         console.error("showView Error:", e);
       }
     }
-
-    // Attach Event Listeners
-    const ownerBtn = document.getElementById('btn-owner');
-    if (ownerBtn) ownerBtn.addEventListener('click', () => showView('owner-auth-view'));
-    
-    const contractorBtn = document.getElementById('btn-contractor');
-    if (contractorBtn) contractorBtn.addEventListener('click', () => showView('contractor-auth-view'));
 
     async function logout() {
       if (supabase && currentUser) {
