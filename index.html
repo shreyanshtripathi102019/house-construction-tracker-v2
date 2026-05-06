@@ -237,23 +237,33 @@
       <div class="auth-wrap">
         <div>
           <h2 data-i18n="contractorAuthTitle">Contractor Login</h2>
-          <p class="muted" style="font-size:.9rem" data-i18n="contractorAuthDesc">Enter the owner's email, your phone and PIN.</p>
-        </div>
-        <div class="form-group">
-          <label class="lbl" data-i18n="ownerEmailLbl">Owner's Email</label>
-          <input type="email" id="cOwnerEmail" placeholder="owner@email.com" />
+          <p class="muted" style="font-size:.9rem" data-i18n="contractorAuthDesc">Enter your phone number. Add your PIN to go directly to a specific owner.</p>
         </div>
         <div class="form-group">
           <label class="lbl" data-i18n="cPhoneLbl">Your Phone Number</label>
           <input type="text" id="cPhone" placeholder="10-digit mobile number" />
         </div>
         <div class="form-group">
-          <label class="lbl" data-i18n="cPinLbl">PIN</label>
-          <input type="password" id="cPin" placeholder="e.g. 1234" />
+          <label class="lbl" data-i18n="cPinLbl">PIN <span class="muted" style="font-weight:400;font-size:.8rem" data-i18n="cPinOptional">(optional)</span></label>
+          <input type="password" id="cPin" placeholder="Leave blank to see all your owners" />
         </div>
         <button class="btn btn-primary" onclick="loginContractor()" data-i18n="loginBtn">Log In</button>
         <button class="btn btn-ghost" onclick="showView('landing-view')" data-i18n="cancelBtn">← Back</button>
         <p id="contractorAuthMsg" class="muted" style="font-size:.85rem"></p>
+      </div>
+    </section>
+
+    <!-- CONTRACTOR MULTI-OWNER VIEW -->
+    <section id="contractor-owners-view" class="view">
+      <div style="max-width:520px;margin:0 auto">
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap">
+          <button class="btn btn-ghost" onclick="showView('contractor-auth-view')">← Back</button>
+          <div>
+            <h2 id="cMultiTitle" style="font-family:var(--font-display)">Your Owners</h2>
+            <p class="muted" style="font-size:.88rem" data-i18n="cMultiDesc">Select an owner to view your agreement and payments.</p>
+          </div>
+        </div>
+        <div id="ownerCardsList" style="display:grid;gap:1rem"></div>
       </div>
     </section>
 
@@ -471,11 +481,11 @@
               </div>
               <div>
                 <label class="lbl" data-i18n="cPhoneLbl">Phone Number</label>
-                <input type="text" id="cPhone" placeholder="10-digit number" />
+                <input type="text" id="acPhone" placeholder="10-digit number" />
               </div>
               <div>
                 <label class="lbl" data-i18n="cPinLbl2">Login PIN</label>
-                <input type="text" id="cPin" placeholder="e.g. 1234" />
+                <input type="text" id="acPin" placeholder="e.g. 1234" />
               </div>
               <div>
                 <label class="lbl" data-i18n="cWorkLbl">Work Type</label>
@@ -494,23 +504,33 @@
 
     <!-- CONTRACTOR DASHBOARD -->
     <section id="contractor-dashboard-view" class="view">
-      <div class="panel">
-        <h2 id="cDashTitle" style="font-family:var(--font-display);margin-bottom:.5rem">Welcome</h2>
-        <p class="muted" style="font-size:.88rem;margin-bottom:1.25rem" data-i18n="cDashDesc">Payments recorded for your work.</p>
-        <div class="stats-grid" style="grid-template-columns:1fr">
-          <div class="stat accent"><div class="lbl" data-i18n="cTotalLbl">Total Received</div><div class="val" id="cTotalVal">₹0</div></div>
+      <div style="max-width:860px;margin:0 auto">
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;flex-wrap:wrap">
+          <button class="btn btn-ghost" id="cBackBtn" onclick="showView('contractor-auth-view')">← Back</button>
+          <div>
+            <h2 id="cDashTitle" style="font-family:var(--font-display)">Welcome</h2>
+            <p id="cOwnerLabel" class="muted" style="font-size:.85rem"></p>
+          </div>
         </div>
-        <div class="table-wrap" style="margin-top:1.25rem">
-          <table>
-            <thead><tr>
-              <th data-i18n="thDate">Date</th>
-              <th data-i18n="thDesc">Description</th>
-              <th data-i18n="thAmount">Amount</th>
-              <th data-i18n="thPayMode">Mode</th>
-              <th data-i18n="thProof">Proof</th>
-            </tr></thead>
-            <tbody id="cPaymentsBody"></tbody>
-          </table>
+        <div class="stats-grid">
+          <div class="stat accent"><div class="lbl" data-i18n="cTotalLbl">Total Received</div><div class="val" id="cTotalVal">₹0</div></div>
+          <div class="stat" id="cAgreedCard" style="display:none"><div class="lbl" data-i18n="cAgreedLbl2">Agreed Amount</div><div class="val" id="cAgreedVal">₹0</div></div>
+          <div class="stat" id="cWorkCard" style="display:none"><div class="lbl" data-i18n="cWorkLbl2">Work Type</div><div class="val" id="cWorkVal" style="font-size:1.1rem">—</div></div>
+        </div>
+        <div class="panel" style="margin-top:1.25rem">
+          <h3 style="font-family:var(--font-display);font-size:1rem;margin-bottom:1rem" data-i18n="cDashDesc">Payments recorded for your work.</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th data-i18n="thDate">Date</th>
+                <th data-i18n="thDesc">Description</th>
+                <th data-i18n="thAmount">Amount</th>
+                <th data-i18n="thPayMode">Mode</th>
+                <th data-i18n="thProof">Proof</th>
+              </tr></thead>
+              <tbody id="cPaymentsBody"></tbody>
+            </table>
+          </div>
         </div>
       </div>
     </section>
@@ -546,7 +566,9 @@
         laluInflow:'Advance Given', laluOutflow:'Paid by Lalu', laluRunBal:'Running Balance',
         setBudgetTitle:'Set Total Budget', setBudgetLbl:'Budget Amount (₹)', saveBudgetBtn:'Save Budget',
         addContractorTitle:'Add / Update Contractor', cNameLbl:'Name', cPinLbl2:'Login PIN', cWorkLbl:'Work Type', cAgreedLbl:'Agreed Amount (₹)', saveContractorBtn:'Save Contractor',
-        cDashDesc:'Payments recorded for your work.', cTotalLbl:'Total Received',
+        cMultiDesc:'Select an owner to view your agreement and payments.', cPinOptional:'(optional)',
+        cDashDesc:'Payments recorded for your work.', cTotalLbl:'Total Received', cAgreedLbl2:'Agreed Amount', cWorkLbl2:'Work Type',
+        cOwnerPrefix:'Owner', viewOwnerBtn:'View Payments',
         editAction:'Edit', deleteAction:'Delete', viewProof:'View Proof',
         paidToLbl:'Paid To', paidByLbl:'Paid By', typeLbl:'Type', modeLbl:'Mode', advPartyLbl:'Advance Holder',
         confirmDelete:'Delete this expense permanently?',
@@ -582,7 +604,9 @@
         laluInflow:'दिया गया एडवांस', laluOutflow:'लालू द्वारा खर्च', laluRunBal:'चलता बैलेंस',
         setBudgetTitle:'कुल बजट सेट करें', setBudgetLbl:'बजट राशि (₹)', saveBudgetBtn:'बजट सेव करें',
         addContractorTitle:'ठेकेदार जोड़ें / अपडेट करें', cNameLbl:'नाम', cPinLbl2:'लॉगिन पिन', cWorkLbl:'काम का प्रकार', cAgreedLbl:'तय राशि (₹)', saveContractorBtn:'ठेकेदार सेव करें',
-        cDashDesc:'आपके काम के लिए दर्ज भुगतानों का इतिहास।', cTotalLbl:'कुल प्राप्त',
+        cMultiDesc:'अपने मालिक चुनें और भुगतान देखें।', cPinOptional:'(वैकल्पिक)',
+        cDashDesc:'आपके काम के लिए दर्ज भुगतानों का इतिहास।', cTotalLbl:'कुल प्राप्त', cAgreedLbl2:'तय राशि', cWorkLbl2:'काम का प्रकार',
+        cOwnerPrefix:'मालिक', viewOwnerBtn:'भुगतान देखें',
         editAction:'एडिट', deleteAction:'हटाएं', viewProof:'प्रूफ देखें',
         paidToLbl:'किसे', paidByLbl:'किसने', typeLbl:'प्रकार', modeLbl:'तरीका', advPartyLbl:'एडवांस होल्डर',
         confirmDelete:'इस खर्च को हमेशा के लिए हटाएं?',
@@ -792,28 +816,83 @@
 
     // ─── CONTRACTOR AUTH ─────────────────────────────────────────────────────
     async function loginContractor() {
-      const ownerEmail = $('cOwnerEmail').value.trim();
       const phone = $('cPhone').value.trim();
-      const pin = $('cPin').value.trim();
-      if (!ownerEmail || !phone || !pin) { $('contractorAuthMsg').textContent = 'All fields required.'; return; }
+      const pin   = $('cPin').value.trim();
+      if (!phone) { $('contractorAuthMsg').textContent = 'Phone number is required.'; return; }
       $('contractorAuthMsg').textContent = 'Checking…';
       try {
         const res = await fetch('/api/contractorAuth', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ownerEmail, phone, pin })
+          body: JSON.stringify({ phone, pin })
         });
         const data = await res.json();
         if (!res.ok) { $('contractorAuthMsg').textContent = data.error || 'Login failed.'; return; }
         $('contractorAuthMsg').textContent = '';
-        showView('contractor-dashboard-view');
-        renderContractorDashboard(data);
-      } catch (e) { $('contractorAuthMsg').textContent = 'Network error. Please try again.'; }
+
+        if (data.mode === 'multi') {
+          // Phone-only: show list of all owners
+          renderMultiOwnerView(data);
+        } else {
+          // Phone + PIN: go directly to payment view
+          showView('contractor-dashboard-view');
+          $('cBackBtn').onclick = () => showView('contractor-auth-view');
+          renderContractorDashboard(data, null);
+        }
+      } catch (e) {
+        $('contractorAuthMsg').textContent = 'Network error. Please try again.';
+      }
     }
 
-    function renderContractorDashboard(data) {
+    function renderMultiOwnerView(data) {
+      $('cMultiTitle').textContent = `Welcome, ${data.contractorName}`;
+      const owners = data.owners || [];
+      $('ownerCardsList').innerHTML = owners.map(o => `
+        <div class="panel" style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;padding:1.1rem 1.25rem">
+          <div>
+            <div style="font-weight:700;font-size:1rem">${esc(o.ownerLabel)}</div>
+            ${o.workType ? `<div class="muted" style="font-size:.82rem;margin-top:.2rem">${esc(o.workType)}${o.agreedAmount ? ` · ${money(o.agreedAmount)} agreed` : ''}</div>` : ''}
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="loadOwnerPayments('${esc(o.contractorId)}','${esc(o.ownerLabel)}')">${esc(t('viewOwnerBtn'))}</button>
+        </div>
+      `).join('');
+      showView('contractor-owners-view');
+    }
+
+    async function loadOwnerPayments(contractorId, ownerLabel) {
+      try {
+        const res = await fetch('/api/contractorOwnerPayments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contractorId })
+        });
+        const data = await res.json();
+        if (!res.ok) { alert(data.error || 'Could not load payments.'); return; }
+        showView('contractor-dashboard-view');
+        // Back button should return to the owners list
+        $('cBackBtn').onclick = () => showView('contractor-owners-view');
+        renderContractorDashboard(data, ownerLabel);
+      } catch (e) {
+        alert('Network error. Please try again.');
+      }
+    }
+
+    function renderContractorDashboard(data, ownerLabel) {
       $('cDashTitle').textContent = `Welcome, ${data.contractorName}`;
+      $('cOwnerLabel').textContent = ownerLabel ? `${t('cOwnerPrefix')}: ${ownerLabel}` : '';
       $('cTotalVal').textContent = money(data.total || 0);
+
+      // Show agreed amount & work type if available
+      if (data.agreedAmount) {
+        $('cAgreedVal').textContent = money(data.agreedAmount);
+        $('cAgreedCard').style.display = '';
+      } else { $('cAgreedCard').style.display = 'none'; }
+
+      if (data.workType) {
+        $('cWorkVal').textContent = data.workType;
+        $('cWorkCard').style.display = '';
+      } else { $('cWorkCard').style.display = 'none'; }
+
       const payments = data.payments || [];
       $('cPaymentsBody').innerHTML = payments.length
         ? payments.map(p => `<tr>
@@ -821,9 +900,11 @@
             <td>${esc(p.Description)}</td>
             <td>${money(p.Amount)}</td>
             <td>${esc(p.PaymentMode || '—')}</td>
-            <td>${p.ScreenshotUrl ? `<a href="${esc(p.ScreenshotUrl)}" target="_blank" rel="noreferrer" class="btn btn-ghost btn-sm">${esc(t('viewProof'))}</a>` : '—'}</td>
+            <td>${p.ScreenshotUrl
+              ? `<a href="${esc(p.ScreenshotUrl)}" target="_blank" rel="noreferrer" class="btn btn-ghost btn-sm">${esc(t('viewProof'))}</a>`
+              : '—'}</td>
           </tr>`).join('')
-        : `<tr><td colspan="5" class="muted" style="text-align:center">${esc(t('noPayments'))}</td></tr>`;
+        : `<tr><td colspan="5" class="muted" style="text-align:center;padding:1.5rem">${esc(t('noPayments'))}</td></tr>`;
     }
 
     // ─── DATA LOADING ────────────────────────────────────────────────────────
@@ -1256,8 +1337,8 @@
       event.preventDefault();
       const name = $('cName').value.trim();
       if (!name) { showBanner('Contractor name is required.', 'error'); return; }
-      const phone = $('cPhone').value.trim();
-      const pin = $('cPin').value.trim();
+      const phone = $('acPhone').value.trim();
+      const pin = $('acPin').value.trim();
       const work_type = $('cWorkType').value.trim();
       const agreed_amount = Number($('cAgreedAmount').value) || 0;
       try {
@@ -1270,7 +1351,7 @@
           ({ error } = await state.supabase.from('hc_contractors').insert({ name, phone, pin, work_type, agreed_amount }));
         }
         if (error) throw error;
-        $('cName').value = ''; $('cPhone').value = ''; $('cPin').value = '';
+        $('cName').value = ''; $('acPhone').value = ''; $('acPin').value = '';
         $('cWorkType').value = ''; $('cAgreedAmount').value = '';
         showBanner(t('contractorSaved'), 'success');
         await loadOwnerData();
