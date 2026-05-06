@@ -9,264 +9,507 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    :root, [data-theme="light"] {
-      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
-      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
-      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
-      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
-      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
-      --space-1: .25rem; --space-2: .5rem; --space-3: .75rem; --space-4: 1rem; --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem; --space-16: 4rem;
-      --color-bg:#fafafa; --color-surface:#ffffff; --color-surface-2:#f4f4f5; --color-border:#e4e4e7; --color-divider:#e4e4e7; --color-text:#18181b; --color-text-muted:#71717a; --color-text-faint:#a1a1aa; --color-primary:#18181b; --color-primary-hover:#000000; --color-primary-highlight:#e4e4e7; --color-success:#16a34a; --color-warning:#ea580c; --color-error:#dc2626; --color-text-inverse:#ffffff; --radius-sm:.375rem; --radius-md:.5rem; --radius-lg:.75rem; --radius-btn:9999px; --radius-xl:1.25rem; --shadow-sm:0 1px 2px rgba(0,0,0,.05); --shadow-md:0 10px 30px rgba(0,0,0,.08); --font-body:'Inter', sans-serif; --font-display:'Manrope', sans-serif;
+    :root,[data-theme="light"]{
+      --bg:#fafafa;--surface:#ffffff;--surface-2:#f4f4f5;--border:#e4e4e7;--divider:#e4e4e7;
+      --text:#18181b;--muted:#71717a;--faint:#a1a1aa;
+      --primary:#18181b;--primary-hover:#000;--primary-hl:#e4e4e7;
+      --success:#16a34a;--warning:#ea580c;--danger:#dc2626;--inverse:#fff;
+      --accent:#18181b;--accent-soft:#f4f4f5;
+      --r-sm:.375rem;--r-md:.5rem;--r-lg:.75rem;--r-xl:1.25rem;--r-btn:9999px;
+      --shadow:0 1px 2px rgba(0,0,0,.05);--shadow-md:0 10px 30px rgba(0,0,0,.08);
+      --font-body:'Inter',sans-serif;--font-display:'Manrope',sans-serif;
     }
-    [data-theme="dark"] {
-      --color-bg:#09090b; --color-surface:#18181b; --color-surface-2:#27272a; --color-border:#3f3f46; --color-divider:#27272a; --color-text:#f4f4f5; --color-text-muted:#a1a1aa; --color-text-faint:#71717a; --color-primary:#ffffff; --color-primary-hover:#f4f4f5; --color-primary-highlight:#27272a; --color-success:#22c55e; --color-warning:#f97316; --color-error:#ef4444; --color-text-inverse:#09090b; --shadow-sm:0 1px 2px rgba(0,0,0,.3); --shadow-md:0 10px 30px rgba(0,0,0,.5);
+    [data-theme="dark"]{
+      --bg:#09090b;--surface:#18181b;--surface-2:#27272a;--border:#3f3f46;--divider:#27272a;
+      --text:#f4f4f5;--muted:#a1a1aa;--faint:#71717a;
+      --primary:#fff;--primary-hover:#f4f4f5;--primary-hl:#27272a;
+      --success:#22c55e;--warning:#f97316;--danger:#ef4444;--inverse:#09090b;
+      --accent:#fff;--accent-soft:#27272a;
+      --shadow:0 1px 2px rgba(0,0,0,.3);--shadow-md:0 10px 30px rgba(0,0,0,.5);
     }
     *{box-sizing:border-box;margin:0;padding:0}
-    html{-webkit-text-size-adjust:none;text-size-adjust:none;scroll-behavior:smooth}
-    body{font-family:var(--font-body);font-size:var(--text-base);background:var(--color-bg);color:var(--color-text);line-height:1.6;min-height:100vh;display:flex;flex-direction:column;}
-    img,svg{display:block;max-width:100%}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--font-body);font-size:1rem;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
     button,input,select,textarea{font:inherit}
     button{cursor:pointer;border:none;background:none}
     a{text-decoration:none;color:inherit}
-    .container{width:min(1180px,calc(100% - 2rem));margin:0 auto}
-    header{position:sticky;top:0;z-index:20;background:color-mix(in srgb, var(--color-bg) 88%, transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--color-divider)}
-    .nav{display:flex;align-items:center;justify-content:space-between;padding:var(--space-4) 0;gap:var(--space-4)}
-    .brand{display:flex;align-items:center;gap:.8rem;font-weight:700; cursor:pointer;}
-    .brand svg{width:36px;height:36px;color:var(--color-primary)}
-    .nav-actions{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
-    .theme-toggle,.lang-toggle{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:.65rem .9rem;border:1px solid var(--color-border);border-radius:999px;background:var(--color-surface)}
-    main{padding:var(--space-8) 0 var(--space-16); flex:1;}
-    h1,h2,h3{font-family:var(--font-display);line-height:1.12;letter-spacing:-0.02em}
-    h1{font-size:var(--text-xl)}
-    h2{font-size:clamp(1.25rem,1rem + 1vw,2rem)}
-    h3{font-size:1.15rem}
-    .lead{margin-top:var(--space-4);color:var(--color-text-muted)}
-    
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:44px;padding:.85rem 1.4rem;border-radius:var(--radius-btn);font-weight:500;font-size:var(--text-sm);letter-spacing:0.01em;transition:.18s ease}
-    .btn-primary{background:var(--color-primary);color:var(--color-text-inverse)}
-    .btn-primary:hover{background:var(--color-primary-hover)}
-    .btn-secondary{background:var(--color-surface-2);border:1px solid var(--color-border)}
-    .btn-ghost{background:transparent;color:var(--color-primary);font-weight:600;}
-    .btn-ghost:hover{color:var(--color-primary-hover);}
-    
-    .panel, .card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);padding:var(--space-6)}
-    .card{padding:var(--space-5)}
-    .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:var(--space-6)}
-    .card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4)}
-    .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-4)}
-    
-    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4);margin-top:var(--space-6)}
-    .stat{padding:var(--space-4);border-radius:var(--radius-lg);background:var(--color-surface-2);border:1px solid var(--color-border)}
-    .stat .label{font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-muted)}
-    .stat .value{font-size:1.5rem;font-weight:700;margin-top:.35rem}
-    
-    .tiny{font-size:var(--text-xs);color:var(--color-text-faint)}
-    .metric{font-size:1.6rem;font-weight:700;margin-top:.4rem}
-    .progress{height:12px;background:var(--color-primary-highlight);border-radius:999px;overflow:hidden;margin-top:.75rem}
-    .progress > span{display:block;height:100%;background:var(--color-primary);width:0%;transition:width 0.4s ease;}
-    
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:1rem;text-align:left;border-bottom:1px solid var(--color-divider);font-size:var(--text-sm)}
-    th{font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-muted)}
-    .tag{display:inline-flex;align-items:center;padding:.32rem .65rem;border-radius:999px;font-size:var(--text-xs);font-weight:700}
-    .tag-paid{background:color-mix(in srgb,var(--color-success) 15%, var(--color-surface));color:var(--color-success)}
-    
-    label{display:grid;gap:.45rem;font-weight:600;font-size:var(--text-sm)}
-    input,select,textarea{width:100%;padding:.9rem 1rem;border:1px solid var(--color-border);border-radius:var(--radius-lg);background:var(--color-surface-2);color:var(--color-text)}
-    textarea{min-height:108px;resize:vertical}
-    
-    /* View Switching Classes */
-    .view-section { display: none; }
-    .view-section.active { display: block; }
-    
-    /* Centered Login Forms */
-    .auth-container { max-width: 400px; margin: 4rem auto; text-align: center; }
-    .auth-container input { margin-bottom: 1rem; }
 
-    /* Premium Hero Layout */
-    .hero-container { position: relative; padding: 6rem 0; min-height: 70vh; display: flex; align-items: center; }
-    .hero-content { position: relative; z-index: 10; max-width: 700px; }
-    .kicker { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; color: var(--color-primary); text-transform: uppercase; margin-bottom: 1.5rem; }
-    .hero-title { font-size: clamp(3rem, 2.5rem + 4vw, 5.5rem); font-weight: 500; letter-spacing: -0.04em; line-height: 1.05; margin-bottom: 2rem; }
-    .hero-subtitle { font-size: clamp(1.1rem, 1rem + 0.5vw, 1.25rem); color: var(--color-text-muted); line-height: 1.6; margin-bottom: 3rem; max-width: 600px; }
-    .hero-actions { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; margin-bottom: 3rem; }
-    .hero-disclaimer { font-size: 0.85rem; color: var(--color-text-faint); }
-    
-    /* Background Circles */
-    .bg-circle { position: absolute; border: 1px solid var(--color-border); border-radius: 50%; pointer-events: none; z-index: 0; }
-    .bg-circle-1 { width: 600px; height: 600px; top: -200px; left: -200px; }
-    .bg-circle-2 { width: 800px; height: 800px; bottom: -300px; right: -200px; }
-    
-    @media (max-width: 980px){.grid,.card-grid,.stats,.form-grid{grid-template-columns:1fr}}
+    .container{width:min(1180px,calc(100% - 2rem));margin:0 auto}
+
+    /* NAV */
+    header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--divider)}
+    .nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 0;gap:1rem;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:.6rem;font-family:var(--font-display);font-weight:700;cursor:pointer}
+    .brand svg{width:30px;height:30px}
+    .nav-actions{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+    .icon-btn{display:inline-flex;align-items:center;justify-content:center;min-width:40px;min-height:40px;padding:.5rem .75rem;border:1px solid var(--border);border-radius:999px;background:var(--surface);font-size:.85rem;font-weight:600}
+
+    /* MAIN */
+    main{padding:2.5rem 0 5rem;flex:1}
+
+    /* VIEWS */
+    .view{display:none}.view.active{display:block}
+
+    /* BUTTONS */
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;min-height:42px;padding:.8rem 1.3rem;border-radius:var(--r-btn);font-weight:600;font-size:.9rem;transition:.15s ease}
+    .btn-primary{background:var(--primary);color:var(--inverse)}.btn-primary:hover{background:var(--primary-hover)}
+    .btn-secondary{background:var(--surface-2);border:1px solid var(--border)}.btn-secondary:hover{background:var(--primary-hl)}
+    .btn-ghost{color:var(--primary);font-weight:700}.btn-ghost:hover{opacity:.75}
+    .btn-danger{background:color-mix(in srgb,var(--danger) 12%,var(--surface));border:1px solid color-mix(in srgb,var(--danger) 30%,var(--border));color:var(--danger)}
+    .btn:disabled{opacity:.55;cursor:wait}
+    .btn-sm{min-height:34px;padding:.5rem .9rem;font-size:.82rem}
+
+    /* PANELS & CARDS */
+    .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:1.5rem;box-shadow:var(--shadow)}
+    .card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.1rem}
+
+    /* BANNER */
+    #banner{padding:.85rem 1.1rem;border-radius:var(--r-lg);font-weight:600;font-size:.9rem;margin-bottom:1.25rem;display:none}
+    #banner.info{background:color-mix(in srgb,#3b82f6 12%,var(--surface));border:1px solid color-mix(in srgb,#3b82f6 25%,var(--border));color:#2563eb}
+    #banner.success{background:color-mix(in srgb,var(--success) 12%,var(--surface));border:1px solid color-mix(in srgb,var(--success) 25%,var(--border));color:var(--success)}
+    #banner.error{background:color-mix(in srgb,var(--danger) 12%,var(--surface));border:1px solid color-mix(in srgb,var(--danger) 25%,var(--border));color:var(--danger)}
+
+    /* STAT CARDS */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin:1.25rem 0}
+    .stat{padding:1.1rem;border-radius:var(--r-lg);background:var(--surface-2);border:1px solid var(--border)}
+    .stat .lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .stat .val{font-size:1.55rem;font-weight:700;margin-top:.3rem;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .stat.accent{background:var(--primary);color:var(--inverse)}.stat.accent .lbl{color:color-mix(in srgb,var(--inverse) 70%,transparent)}
+
+    /* TABS */
+    .tab-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem}
+    .tab-btn{padding:.65rem 1.1rem;border-radius:999px;font-weight:600;font-size:.85rem;border:1px solid var(--border);background:var(--surface-2);color:var(--muted);transition:.15s}
+    .tab-btn.active{background:var(--primary);color:var(--inverse);border-color:transparent}
+    .tab-panel{display:none}.tab-panel.active{display:block}
+
+    /* FORMS */
+    .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
+    .form-group{display:grid;gap:.4rem}.form-group.full{grid-column:1/-1}
+    label.lbl{font-weight:600;font-size:.85rem}
+    input,select,textarea{width:100%;padding:.75rem 1rem;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--surface-2);color:var(--text);transition:border-color .15s,box-shadow .15s}
+    input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 14%,transparent)}
+    textarea{min-height:96px;resize:vertical}
+
+    /* TABLE */
+    .table-wrap{overflow-x:auto;border-radius:var(--r-lg)}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:.9rem 1rem;text-align:left;border-bottom:1px solid var(--divider);font-size:.88rem}
+    th{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+    tbody tr:hover{background:var(--surface-2)}
+
+    /* HISTORY ITEMS */
+    .history-list{display:grid;gap:.85rem}
+    .history-item{border:1px solid var(--border);border-radius:var(--r-lg);padding:1.1rem;background:var(--surface)}
+    .history-item strong{display:block;margin-bottom:.4rem}
+    .history-meta{color:var(--muted);font-size:.82rem;margin-top:.4rem}
+    .history-actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.75rem}
+
+    /* ADVANCE LEDGER */
+    .advance-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:1.25rem}
+    .pill{display:inline-flex;align-items:center;padding:.28rem .65rem;border-radius:999px;font-size:.72rem;font-weight:700}
+    .pill-in{background:color-mix(in srgb,var(--success) 15%,var(--surface));color:var(--success)}
+    .pill-out{background:color-mix(in srgb,var(--danger) 12%,var(--surface));color:var(--danger)}
+    .pill-bal{background:var(--accent-soft);color:var(--primary)}
+
+    /* CHARTS */
+    .visual-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:1.25rem;margin:1.25rem 0}
+    .budget-ring-wrap{display:grid;grid-template-columns:160px 1fr;gap:1.25rem;align-items:center}
+    .budget-ring{width:150px;height:150px;border-radius:50%;display:grid;place-items:center;position:relative;margin:0 auto;
+      background:conic-gradient(var(--primary) 0deg,var(--primary) 0deg,var(--primary-hl) 0deg,var(--primary-hl) 360deg)}
+    .budget-ring::after{content:"";position:absolute;inset:14px;border-radius:50%;background:var(--surface);border:1px solid var(--border)}
+    .ring-content{position:relative;z-index:1;text-align:center}
+    .ring-pct{font-size:1.6rem;font-weight:800;line-height:1;font-family:var(--font-display)}
+    .ring-lbl{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .budget-rows{display:grid;gap:.6rem}
+    .budget-row{display:flex;justify-content:space-between;align-items:center;padding:.7rem .9rem;border-radius:var(--r-md);background:var(--surface-2);border:1px solid var(--border);font-size:.88rem}
+    .budget-row span{color:var(--muted)}
+    .bars-list{display:grid;gap:.85rem;margin-top:.75rem}
+    .bar-row{display:grid;gap:.35rem}
+    .bar-meta{display:flex;justify-content:space-between;font-size:.82rem}
+    .bar-track{height:10px;border-radius:999px;background:var(--primary-hl);overflow:hidden}
+    .bar-fill{height:100%;border-radius:inherit;background:var(--primary)}
+    .trend-bars{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:.6rem;align-items:end;min-height:160px;margin-top:1rem}
+    .trend-day{display:grid;gap:.4rem;justify-items:center}
+    .trend-col-wrap{height:120px;width:100%;display:flex;align-items:flex-end;justify-content:center;padding:0 4px}
+    .trend-col{width:min(36px,100%);min-height:8px;border-radius:8px 8px 4px 4px;background:var(--primary)}
+    .trend-amt{font-size:.65rem;font-weight:700;text-align:center;color:var(--primary)}
+    .trend-lbl{font-size:.62rem;color:var(--muted);text-align:center}
+    .visual-empty{padding:1rem;border-radius:var(--r-md);border:1px dashed var(--border);color:var(--muted);font-size:.88rem;text-align:center}
+
+    /* AUTH */
+    .auth-wrap{max-width:380px;margin:4rem auto;display:grid;gap:1rem}
+    .auth-wrap h2{font-family:var(--font-display);margin-bottom:.25rem}
+
+    /* HERO */
+    .hero{padding:5rem 0;min-height:60vh;display:flex;align-items:center;position:relative}
+    .hero-content{position:relative;z-index:1;max-width:640px}
+    .kicker{font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:1.25rem}
+    .hero-title{font-family:var(--font-display);font-size:clamp(2.8rem,2rem + 4vw,5rem);font-weight:600;letter-spacing:-.03em;line-height:1.06;margin-bottom:1.5rem}
+    .hero-sub{font-size:1.05rem;color:var(--muted);line-height:1.65;margin-bottom:2.5rem;max-width:520px}
+    .hero-actions{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem}
+    .hero-note{font-size:.82rem;color:var(--faint)}
+    .bg-circle{position:absolute;border:1px solid var(--border);border-radius:50%;pointer-events:none}
+    .bg-circle-1{width:500px;height:500px;top:-180px;left:-160px}
+    .bg-circle-2{width:700px;height:700px;bottom:-280px;right:-180px}
+
+    /* TAG */
+    .tag{display:inline-flex;align-items:center;padding:.25rem .55rem;border-radius:999px;font-size:.72rem;font-weight:700}
+    .tag-paid{background:color-mix(in srgb,var(--success) 14%,var(--surface));color:var(--success)}
+
+    /* FLOW HINT */
+    .flow-hint{font-size:.82rem;color:var(--muted);padding:.5rem .75rem;background:var(--surface-2);border-radius:var(--r-md);border:1px solid var(--border)}
+
+    /* UTIL */
+    .hidden{display:none!important}
+    .muted{color:var(--muted)}
+    .gap-sm{display:flex;gap:.5rem;flex-wrap:wrap}
+
+    @media(max-width:900px){.visual-grid{grid-template-columns:1fr}.budget-ring-wrap{grid-template-columns:1fr}}
+    @media(max-width:640px){.stats-grid{grid-template-columns:1fr 1fr}.nav{padding:.75rem 0}}
   </style>
 </head>
 <body>
   <header>
     <div class="container nav">
       <div class="brand" onclick="showView('landing-view')">
-        <svg width="28" height="28" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-arit-graphite" aria-label="ARIT logo">
-          <path d="M17 80L47 15L79 80" stroke="currentColor" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"></path>
-          <path d="M35 57L58 50" stroke="currentColor" stroke-width="9" stroke-linecap="round"></path>
-          <path d="M52 60L69 77L58 80Z" fill="#C5B358"></path>
+        <svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17 80L47 15L79 80" stroke="currentColor" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M35 57L58 50" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>
+          <path d="M52 60L69 77L58 80Z" fill="#C5B358"/>
         </svg>
-        <div>
-          <div>ARIT <span style="color:var(--color-text-faint); font-weight:400; margin-left:2px;">| Nirmaan</span></div>
-        </div>
+        ARIT <span style="color:var(--faint);font-weight:400;margin-left:3px;">| Nirmaan</span>
       </div>
       <div class="nav-actions">
-        <button class="btn btn-secondary" id="logoutBtn" style="display:none;" onclick="logout()">Logout</button>
-        <button class="lang-toggle" type="button" data-lang-toggle>हिंदी</button>
-        <button class="theme-toggle" type="button" data-theme-toggle>◐</button>
+        <button id="logoutBtn" class="btn btn-secondary btn-sm" style="display:none" onclick="logout()">Logout</button>
+        <button class="icon-btn" onclick="toggleLang()">हि/A</button>
+        <button class="icon-btn" onclick="toggleTheme()">◐</button>
       </div>
     </div>
   </header>
 
   <main class="container">
-    <!-- LANDING VIEW -->
-    <section id="landing-view" class="view-section active">
-      <div class="hero-container">
+    <div id="banner"></div>
+
+    <!-- LANDING -->
+    <section id="landing-view" class="view active">
+      <div class="hero">
         <div class="bg-circle bg-circle-1"></div>
         <div class="bg-circle bg-circle-2"></div>
-        
         <div class="hero-content">
-          <p class="kicker" data-i18n="kickerText">CONSTRUCTION MANAGEMENT</p>
+          <p class="kicker" data-i18n="kicker">CONSTRUCTION MANAGEMENT</p>
           <h1 class="hero-title" data-i18n="heroTitle">Track expenses.<br>Build better.</h1>
-          <p class="hero-subtitle" data-i18n="heroSubtitle">Owners manage the budget, contractors view their payments. Everything in one place, no app download needed.</p>
-          
+          <p class="hero-sub" data-i18n="heroSub">Owners manage the budget, contractors view their payments. Everything in one place.</p>
           <div class="hero-actions">
-            <button class="btn btn-primary" id="btn-owner" data-i18n="btnOwner">I'm a house owner</button>
-            <button class="btn btn-ghost" id="btn-contractor" data-i18n="btnContractor">I'm a contractor</button>
+            <button class="btn btn-primary" onclick="showView('owner-auth-view')" data-i18n="btnOwner">I'm a house owner</button>
+            <button class="btn btn-ghost" onclick="showView('contractor-auth-view')" data-i18n="btnContractor">I'm a contractor</button>
           </div>
-          
-          <p class="hero-disclaimer" data-i18n="heroDisclaimer">Contractors sign in with a phone number and PIN — no email required.</p>
+          <p class="hero-note" data-i18n="heroNote">Contractors sign in with phone number and PIN — no email required.</p>
         </div>
       </div>
     </section>
 
-    <!-- OWNER AUTH VIEW -->
-    <section id="owner-auth-view" class="view-section auth-container">
-      <h2 data-i18n="ownerAuthTitle">Owner Login</h2>
-      <p class="lead" data-i18n="ownerAuthDesc" style="margin-bottom:2rem;">Sign in or create an account.</p>
-      <input type="email" id="ownerEmail" placeholder="Email address" />
-      <input type="password" id="ownerPassword" placeholder="Password" />
-      <div style="display:flex; gap:1rem;">
-        <button class="btn btn-primary" style="flex:1;" onclick="loginOwner()" data-i18n="loginBtn">Log In</button>
-        <button class="btn btn-secondary" style="flex:1;" onclick="signupOwner()" data-i18n="signupBtn">Sign Up</button>
+    <!-- OWNER AUTH -->
+    <section id="owner-auth-view" class="view">
+      <div class="auth-wrap">
+        <div>
+          <h2 data-i18n="ownerAuthTitle">Owner Login</h2>
+          <p class="muted" style="font-size:.9rem" data-i18n="ownerAuthDesc">Sign in or create an account.</p>
+        </div>
+        <div class="form-group">
+          <label class="lbl">Email</label>
+          <input type="email" id="ownerEmail" placeholder="you@email.com" />
+        </div>
+        <div class="form-group">
+          <label class="lbl">Password</label>
+          <input type="password" id="ownerPassword" placeholder="Password" />
+        </div>
+        <div class="gap-sm">
+          <button class="btn btn-primary" style="flex:1" onclick="loginOwner()" data-i18n="loginBtn">Log In</button>
+          <button class="btn btn-secondary" style="flex:1" onclick="signupOwner()" data-i18n="signupBtn">Sign Up</button>
+        </div>
+        <button class="btn btn-ghost" onclick="showView('landing-view')" data-i18n="cancelBtn">← Back</button>
+        <p id="ownerAuthMsg" class="muted" style="font-size:.85rem"></p>
       </div>
-      <button class="btn btn-secondary" style="width:100%; margin-top:1rem; border:none;" onclick="showView('landing-view')" data-i18n="cancelBtn">Cancel</button>
     </section>
 
-    <!-- CONTRACTOR AUTH VIEW -->
-    <section id="contractor-auth-view" class="view-section auth-container">
-      <h2 data-i18n="contractorAuthTitle">Contractor Login</h2>
-      <p class="lead" data-i18n="contractorAuthDesc" style="margin-bottom:2rem;">Enter the Owner's email, your phone number and PIN.</p>
-      <input type="email" id="contractorOwnerEmail" placeholder="Owner's Email Address" />
-      <input type="text" id="contractorPhone" placeholder="Your Phone (e.g. 9876543210)" />
-      <input type="password" id="contractorPin" placeholder="PIN" />
-      <button class="btn btn-primary" style="width:100%" onclick="loginContractor()" data-i18n="loginBtn">Login</button>
-      <button class="btn btn-secondary" style="width:100%; margin-top:1rem; border:none;" onclick="showView('landing-view')" data-i18n="cancelBtn">Cancel</button>
+    <!-- CONTRACTOR AUTH -->
+    <section id="contractor-auth-view" class="view">
+      <div class="auth-wrap">
+        <div>
+          <h2 data-i18n="contractorAuthTitle">Contractor Login</h2>
+          <p class="muted" style="font-size:.9rem" data-i18n="contractorAuthDesc">Enter the owner's email, your phone and PIN.</p>
+        </div>
+        <div class="form-group">
+          <label class="lbl" data-i18n="ownerEmailLbl">Owner's Email</label>
+          <input type="email" id="cOwnerEmail" placeholder="owner@email.com" />
+        </div>
+        <div class="form-group">
+          <label class="lbl" data-i18n="cPhoneLbl">Your Phone Number</label>
+          <input type="text" id="cPhone" placeholder="10-digit mobile number" />
+        </div>
+        <div class="form-group">
+          <label class="lbl" data-i18n="cPinLbl">PIN</label>
+          <input type="password" id="cPin" placeholder="e.g. 1234" />
+        </div>
+        <button class="btn btn-primary" onclick="loginContractor()" data-i18n="loginBtn">Log In</button>
+        <button class="btn btn-ghost" onclick="showView('landing-view')" data-i18n="cancelBtn">← Back</button>
+        <p id="contractorAuthMsg" class="muted" style="font-size:.85rem"></p>
+      </div>
     </section>
 
     <!-- OWNER DASHBOARD -->
-    <section id="owner-dashboard-view" class="view-section">
-      <div class="panel" style="margin-bottom:var(--space-8);">
-        <h2 data-i18n="summaryTitle">Project Overview</h2>
-        <div class="stats">
-          <div class="stat"><div class="label" data-i18n="budgetLabel">Total Budget</div><div class="value" id="valTotalBudget">₹--</div></div>
-          <div class="stat"><div class="label" data-i18n="spentLabel">Total Spent</div><div class="value" id="valSpent">₹--</div></div>
-          <div class="stat"><div class="label" data-i18n="pendingLabel">Remaining</div><div class="value" id="valPending">₹--</div></div>
+    <section id="owner-dashboard-view" class="view">
+      <div class="panel" style="margin-bottom:1.5rem">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap">
+          <div>
+            <h2 style="font-family:var(--font-display)" data-i18n="dashTitle">Project Dashboard</h2>
+            <p class="muted" style="font-size:.88rem;margin-top:.25rem" data-i18n="dashDesc">Budget, expenses, payments — all in one place.</p>
+          </div>
+          <div class="gap-sm">
+            <button class="btn btn-secondary btn-sm" onclick="refreshOwnerData()">↻ <span data-i18n="refreshBtn">Refresh</span></button>
+          </div>
         </div>
-        <div style="margin-top:var(--space-4);">
-          <div class="tiny" data-i18n="burnTitle">Budget Progress</div>
-          <div class="progress" aria-hidden="true"><span id="valBurnBar" style="width:0%"></span></div>
+        <div class="tab-row" style="margin-top:1.25rem;margin-bottom:0">
+          <button class="tab-btn active" id="tab-dashboardBtn" onclick="switchTab('dashboard')" data-i18n="tabDashboard">Dashboard</button>
+          <button class="tab-btn" id="tab-addExpenseBtn" onclick="switchTab('addExpense')" data-i18n="tabAddExpense">Add Expense</button>
+          <button class="tab-btn" id="tab-historyBtn" onclick="switchTab('history')" data-i18n="tabHistory">History</button>
+          <button class="tab-btn" id="tab-laluAdvanceBtn" onclick="switchTab('laluAdvance')" data-i18n="tabLaluAdvance">Lalu Advance</button>
+          <button class="tab-btn" id="tab-settingsBtn" onclick="switchTab('settings')" data-i18n="tabSettings">Settings</button>
         </div>
       </div>
 
-      <div class="grid">
-        <!-- Add Expense -->
-        <div class="panel">
-          <h2 data-i18n="addExpenseTitle" style="margin-bottom:var(--space-4);">Log New Expense</h2>
-          <div class="form-grid">
-            <label>
-              <span data-i18n="expenseType">Category</span>
-              <select id="expType">
-                <option value="Material" data-i18n="materialOpt">Material</option>
-                <option value="Labour" data-i18n="labourOpt">Labour</option>
-                <option value="Transport" data-i18n="transportOpt">Transport</option>
-                <option value="Miscellaneous" data-i18n="miscOpt">Miscellaneous</option>
-              </select>
-            </label>
-            <label>
-              <span data-i18n="amountLabel">Amount</span>
-              <input type="number" id="expAmount" placeholder="e.g. 5000" />
-            </label>
-            <label style="grid-column:1/-1">
-              <span data-i18n="vendorLabel">Contractor / Vendor</span>
-              <div style="display:flex; gap:0.5rem;">
-                <select id="vendorSelect" style="flex:1;"><option value="">Select Existing...</option></select>
-                <input type="text" id="vendorInput" placeholder="Or type new name" style="flex:1;" />
+      <!-- DASHBOARD TAB -->
+      <div id="tab-dashboard" class="tab-panel active">
+        <div class="stats-grid">
+          <div class="stat accent"><div class="lbl" data-i18n="lblBudget">Total Budget</div><div class="val" id="valBudget">₹—</div></div>
+          <div class="stat"><div class="lbl" data-i18n="lblSpent">Total Spent</div><div class="val" id="valSpent">₹—</div></div>
+          <div class="stat"><div class="lbl" data-i18n="lblContractor">Work Payments</div><div class="val" id="valContractor">₹—</div></div>
+          <div class="stat"><div class="lbl" data-i18n="lblMaterial">Material</div><div class="val" id="valMaterial">₹—</div></div>
+          <div class="stat"><div class="lbl" data-i18n="lblLaluBal">Lalu Advance Balance</div><div class="val" id="valLaluBal">₹—</div></div>
+        </div>
+
+        <div class="visual-grid">
+          <div class="panel">
+            <h3 style="font-family:var(--font-display);font-size:1rem" data-i18n="visualBudgetTitle">Budget Progress</h3>
+            <p class="muted" style="font-size:.82rem;margin-top:.2rem" data-i18n="visualBudgetDesc">How much of the project budget is used.</p>
+            <div class="budget-ring-wrap" style="margin-top:1rem">
+              <div id="budgetRing" class="budget-ring">
+                <div class="ring-content">
+                  <div id="ringPct" class="ring-pct">0%</div>
+                  <div class="ring-lbl" data-i18n="usedLbl">Used</div>
+                </div>
               </div>
-            </label>
-            <label>
-              <span data-i18n="dateLabel">Date</span>
-              <input type="date" id="expDate" />
-            </label>
-            <label style="grid-column:1/-1">
-              <span data-i18n="notesLabel">Notes</span>
-              <textarea id="expNotes" placeholder="Details..."></textarea>
-            </label>
-            <label style="grid-column:1/-1">
-              <span data-i18n="proofLabel">Payment Proof (Image)</span>
-              <input type="file" id="expProof" accept="image/*" />
-            </label>
+              <div class="budget-rows">
+                <div class="budget-row"><span data-i18n="spentLbl">Spent</span><strong id="ringSpent">₹0</strong></div>
+                <div class="budget-row"><span data-i18n="remainingLbl">Remaining</span><strong id="ringRemaining">₹0</strong></div>
+                <div class="budget-row"><span data-i18n="budgetLbl">Budget</span><strong id="ringBudget">₹0</strong></div>
+              </div>
+            </div>
           </div>
-          <div style="margin-top:var(--space-4);">
-            <button class="btn btn-primary" id="saveExpenseBtn" onclick="saveExpense()" data-i18n="saveExpense">Save Expense</button>
+          <div class="panel">
+            <h3 style="font-family:var(--font-display);font-size:1rem" data-i18n="visualCatTitle">Category Split</h3>
+            <p class="muted" style="font-size:.82rem;margin-top:.2rem" data-i18n="visualCatDesc">Where the money is going.</p>
+            <div id="categoryBars" class="bars-list"></div>
           </div>
         </div>
 
-        <!-- Manage Contractors -->
-        <div class="panel">
-          <h2 data-i18n="manageContractorsTitle" style="margin-bottom:var(--space-4);">Add Contractor Profile</h2>
-          <p class="tiny" data-i18n="manageContractorsDesc" style="margin-bottom:var(--space-4);">Create a profile to give a contractor access to their payment history.</p>
-          <div class="form-grid" style="grid-template-columns:1fr;">
-            <label>
-              <span data-i18n="cNameLabel">Name</span>
-              <input type="text" id="newCName" placeholder="e.g. Jaya Prakash" />
-            </label>
-            <label>
-              <span data-i18n="cPhoneLabel">Phone Number</span>
-              <input type="text" id="newCPhone" placeholder="10 digits" />
-            </label>
-            <label>
-              <span data-i18n="cPinLabel">Login PIN</span>
-              <input type="text" id="newCPin" placeholder="e.g. 1234" />
-            </label>
+        <div class="panel" style="margin-top:1.25rem">
+          <h3 style="font-family:var(--font-display);font-size:1rem" data-i18n="trendTitle">Last 7 Days</h3>
+          <p class="muted" style="font-size:.82rem;margin-top:.2rem" data-i18n="trendDesc">Daily spending for the most recent week.</p>
+          <div id="spendTrend" class="trend-bars"></div>
+        </div>
+
+        <div class="panel" style="margin-top:1.25rem">
+          <h3 style="font-family:var(--font-display);font-size:1rem;margin-bottom:1rem" data-i18n="recentTitle">Recent Expenses</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th data-i18n="thDate">Date</th>
+                <th data-i18n="thCat">Category</th>
+                <th data-i18n="thDesc">Description</th>
+                <th data-i18n="thPaidTo">Paid To</th>
+                <th data-i18n="thAmount">Amount</th>
+                <th data-i18n="thActions">Actions</th>
+              </tr></thead>
+              <tbody id="recentBody"></tbody>
+            </table>
           </div>
-          <div style="margin-top:var(--space-4);">
-            <button class="btn btn-secondary" id="saveContractorBtn" onclick="saveContractor()" data-i18n="saveContractorBtn">Save Contractor</button>
+        </div>
+      </div>
+
+      <!-- ADD EXPENSE TAB -->
+      <div id="tab-addExpense" class="tab-panel">
+        <div class="panel">
+          <h3 id="expFormTitle" style="font-family:var(--font-display);margin-bottom:.25rem" data-i18n="addExpTitle">Add Expense</h3>
+          <p id="expFormDesc" class="muted" style="font-size:.85rem;margin-bottom:1.25rem" data-i18n="addExpDesc">Record a contractor payment or construction expense.</p>
+          <form id="expenseForm" onsubmit="saveExpense(event)">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="lbl" data-i18n="lblDate">Date</label>
+                <input type="date" id="expDate" required />
+              </div>
+              <div class="form-group">
+                <label class="lbl" data-i18n="lblTime">Time</label>
+                <input type="time" id="expTime" />
+              </div>
+              <div class="form-group">
+                <label class="lbl" data-i18n="lblEntryKind">Entry Type</label>
+                <select id="expEntryKind" required onchange="syncFormState()">
+                  <option value="" data-i18n="selEntryKind">Select type</option>
+                  <option value="DirectExpense" data-i18n="kindDirect">Direct Expense</option>
+                  <option value="AdvanceGiven" data-i18n="kindAdvGiven">Advance to Lalu</option>
+                  <option value="AdvanceSettlement" data-i18n="kindAdvSettle">Expense from Lalu Advance</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="lbl" data-i18n="lblPaidBy">Paid By</label>
+                <select id="expPaidBy" required onchange="handlePaidByChange()">
+                  <option value="" data-i18n="selPaidBy">Select payer</option>
+                  <option value="Shreyansh">Shreyansh</option>
+                  <option value="Rajesh">Rajesh</option>
+                  <option value="Lalu">Lalu</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="lbl" data-i18n="lblCategory">Category</label>
+                <select id="expCategory" required onchange="syncFormState()">
+                  <option value="" data-i18n="selCategory">Select category</option>
+                  <option value="Material" data-i18n="catMaterial">Material</option>
+                  <option value="Contractor" data-i18n="catContractor">Contractor</option>
+                  <option value="Equipment" data-i18n="catEquipment">Equipment</option>
+                  <option value="Miscellaneous" data-i18n="catMisc">Miscellaneous</option>
+                  <option value="Advance" data-i18n="catAdvance">Advance</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="lbl" data-i18n="lblAmount">Amount (₹)</label>
+                <input type="number" id="expAmount" min="0" step="0.01" required placeholder="e.g. 5000" />
+              </div>
+              <div class="form-group">
+                <label class="lbl" data-i18n="lblPayMode">Payment Mode</label>
+                <select id="expPayMode" required>
+                  <option value="" data-i18n="selPayMode">Select mode</option>
+                  <option value="UPI">UPI</option>
+                  <option value="Cash" data-i18n="modeCash">Cash</option>
+                  <option value="Bank Transfer" data-i18n="modeBankTransfer">Bank Transfer</option>
+                  <option value="Cheque" data-i18n="modeCheque">Cheque</option>
+                </select>
+              </div>
+              <div id="advPartyGroup" class="form-group hidden">
+                <label class="lbl" data-i18n="lblAdvParty">Advance Holder</label>
+                <select id="expAdvParty" onchange="syncFormState()">
+                  <option value="" data-i18n="selAdvParty">Select holder</option>
+                  <option value="Lalu">Lalu</option>
+                </select>
+              </div>
+              <div class="form-group full">
+                <label class="lbl" data-i18n="lblDesc">Description</label>
+                <textarea id="expDesc" required placeholder="e.g. Cement bags, shuttering labour, plumbing advance"></textarea>
+              </div>
+              <div class="form-group">
+                <label class="lbl" data-i18n="lblPaidTo">Paid To</label>
+                <div id="paidToContainer">
+                  <input type="text" id="expPaidTo" required placeholder="Vendor or contractor name" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="lbl" data-i18n="lblBill">Bill / Screenshot</label>
+                <input type="file" id="expProof" accept="image/*" />
+              </div>
+            </div>
+            <div id="flowHint" class="flow-hint hidden" style="margin-top:1rem"></div>
+            <div id="editBillNote" class="hidden" style="margin-top:.5rem;font-size:.82rem"></div>
+            <div class="gap-sm" style="margin-top:1.25rem">
+              <button type="submit" id="saveExpBtn" class="btn btn-primary" data-i18n="saveExpBtn">Save Expense</button>
+              <button type="button" id="cancelEditBtn" class="btn btn-secondary hidden" onclick="clearExpenseForm()" data-i18n="cancelEditBtn">Cancel Edit</button>
+              <button type="button" class="btn btn-secondary" onclick="clearExpenseForm()" data-i18n="clearFormBtn">Clear Form</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- HISTORY TAB -->
+      <div id="tab-history" class="tab-panel">
+        <div class="panel">
+          <h3 style="font-family:var(--font-display);margin-bottom:.25rem" data-i18n="historyTitle">Expense History</h3>
+          <p class="muted" style="font-size:.85rem;margin-bottom:1.25rem" data-i18n="historyDesc">All saved expenses in reverse chronological order.</p>
+          <div id="historyList" class="history-list"></div>
+        </div>
+      </div>
+
+      <!-- LALU ADVANCE TAB -->
+      <div id="tab-laluAdvance" class="tab-panel">
+        <div class="panel">
+          <h3 style="font-family:var(--font-display);margin-bottom:.25rem" data-i18n="laluTitle">Lalu Advance Ledger</h3>
+          <p class="muted" style="font-size:.85rem;margin-bottom:1.25rem" data-i18n="laluDesc">Advances given to Lalu, what he spent, and the running balance.</p>
+          <div class="advance-summary">
+            <div class="stat accent"><div class="lbl" data-i18n="laluGivenLbl">Total Advance Given</div><div class="val" id="laluGiven">₹0</div></div>
+            <div class="stat"><div class="lbl" data-i18n="laluSpentLbl">Paid by Lalu</div><div class="val" id="laluSpent">₹0</div></div>
+            <div class="stat"><div class="lbl" data-i18n="lblLaluBal">Balance</div><div class="val" id="laluBalance">₹0</div></div>
+          </div>
+          <div id="laluList" class="history-list"></div>
+        </div>
+      </div>
+
+      <!-- SETTINGS TAB -->
+      <div id="tab-settings" class="tab-panel">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem">
+          <div class="panel">
+            <h3 style="font-family:var(--font-display);margin-bottom:1rem" data-i18n="setBudgetTitle">Set Total Budget</h3>
+            <form onsubmit="saveBudget(event)" class="form-group">
+              <label class="lbl" data-i18n="setBudgetLbl">Budget Amount (₹)</label>
+              <input type="number" id="budgetInput" min="0" step="1" required />
+              <button type="submit" class="btn btn-primary" style="margin-top:.5rem" data-i18n="saveBudgetBtn">Save Budget</button>
+            </form>
+          </div>
+          <div class="panel">
+            <h3 style="font-family:var(--font-display);margin-bottom:1rem" data-i18n="addContractorTitle">Add / Update Contractor</h3>
+            <form onsubmit="saveContractor(event)" class="form-group" style="gap:.75rem">
+              <div>
+                <label class="lbl" data-i18n="cNameLbl">Name</label>
+                <input type="text" id="cName" required placeholder="Contractor name" />
+              </div>
+              <div>
+                <label class="lbl" data-i18n="cPhoneLbl">Phone Number</label>
+                <input type="text" id="cPhone" placeholder="10-digit number" />
+              </div>
+              <div>
+                <label class="lbl" data-i18n="cPinLbl2">Login PIN</label>
+                <input type="text" id="cPin" placeholder="e.g. 1234" />
+              </div>
+              <div>
+                <label class="lbl" data-i18n="cWorkLbl">Work Type</label>
+                <input type="text" id="cWorkType" placeholder="Civil, plumbing, electrical..." />
+              </div>
+              <div>
+                <label class="lbl" data-i18n="cAgreedLbl">Agreed Amount (₹)</label>
+                <input type="number" id="cAgreedAmount" min="0" step="1" />
+              </div>
+              <button type="submit" class="btn btn-secondary" data-i18n="saveContractorBtn">Save Contractor</button>
+            </form>
           </div>
         </div>
       </div>
     </section>
 
     <!-- CONTRACTOR DASHBOARD -->
-    <section id="contractor-dashboard-view" class="view-section">
+    <section id="contractor-dashboard-view" class="view">
       <div class="panel">
-        <h2 id="cDashTitle">Welcome</h2>
-        <p class="muted" data-i18n="cDashLead" style="margin-bottom:var(--space-4);">Here is the history of payments recorded for your work.</p>
-        <div style="overflow-x:auto;">
+        <h2 id="cDashTitle" style="font-family:var(--font-display);margin-bottom:.5rem">Welcome</h2>
+        <p class="muted" style="font-size:.88rem;margin-bottom:1.25rem" data-i18n="cDashDesc">Payments recorded for your work.</p>
+        <div class="stats-grid" style="grid-template-columns:1fr">
+          <div class="stat accent"><div class="lbl" data-i18n="cTotalLbl">Total Received</div><div class="val" id="cTotalVal">₹0</div></div>
+        </div>
+        <div class="table-wrap" style="margin-top:1.25rem">
           <table>
-            <thead>
-              <tr>
-                <th data-i18n="thDate">Date</th>
-                <th data-i18n="thWork">Work/Notes</th>
-                <th data-i18n="thAmount">Amount</th>
-                <th data-i18n="thStatus">Status</th>
-              </tr>
-            </thead>
-            <tbody id="cDashTable">
-            </tbody>
+            <thead><tr>
+              <th data-i18n="thDate">Date</th>
+              <th data-i18n="thDesc">Description</th>
+              <th data-i18n="thAmount">Amount</th>
+              <th data-i18n="thPayMode">Mode</th>
+              <th data-i18n="thProof">Proof</th>
+            </tr></thead>
+            <tbody id="cPaymentsBody"></tbody>
           </table>
         </div>
       </div>
@@ -274,284 +517,772 @@
   </main>
 
   <script>
-    window.onerror = function(msg, url, line) {
-      alert("Error: " + msg + "\nLine: " + line); 
-    };
-
-    // Attach Event Listeners FIRST so nothing can block them
-    try {
-      const ownerBtn = document.getElementById('btn-owner');
-      if (ownerBtn) ownerBtn.addEventListener('click', () => showView('owner-auth-view'));
-      
-      const contractorBtn = document.getElementById('btn-contractor');
-      if (contractorBtn) contractorBtn.addEventListener('click', () => showView('contractor-auth-view'));
-    } catch(e) {
-      alert("Error attaching clicks: " + e.message);
-    }
-
-    const i18n = {
+    // ─── i18n ───────────────────────────────────────────────────────────────
+    const I18N = {
       en: {
-        kickerText:'CONSTRUCTION MANAGEMENT', heroTitle:'Track expenses.\nBuild better.', heroSubtitle:'Owners manage the budget, contractors view their payments. Everything in one place, no app download needed.', btnOwner:'I\'m a house owner', btnContractor:'I\'m a contractor', heroDisclaimer:'Contractors sign in with a phone number and PIN — no email required.',
-        ownerAuthTitle:'Owner Login', ownerAuthDesc:'Sign in or create an account.', signupBtn:'Sign Up', cancelBtn:'Cancel',
-        contractorAuthTitle:'Contractor Login', contractorAuthDesc:'Enter the Owner\'s email, your phone number and PIN.', loginBtn:'Log In',
-        summaryTitle:'Project Overview', budgetLabel:'Total Budget', spentLabel:'Total Spent', pendingLabel:'Remaining', burnTitle:'Budget Progress',
-        addExpenseTitle:'Log New Expense', expenseType:'Category', materialOpt:'Material', labourOpt:'Labour', transportOpt:'Transport', miscOpt:'Miscellaneous', amountLabel:'Amount', vendorLabel:'Contractor / Vendor', dateLabel:'Date', notesLabel:'Notes', proofLabel:'Payment Proof', saveExpense:'Save Expense',
-        manageContractorsTitle:'Add Contractor Profile', manageContractorsDesc:'Create a profile to give a contractor access to their payment history.', cNameLabel:'Name', cPhoneLabel:'Phone Number', cPinLabel:'Login PIN', saveContractorBtn:'Save Contractor',
-        cDashLead:'Here is the history of payments recorded for your work.', thDate:'Date', thWork:'Work/Notes', thAmount:'Amount', thStatus:'Status', paid:'Paid'
+        kicker:'CONSTRUCTION MANAGEMENT', heroTitle:'Track expenses.\nBuild better.', heroSub:'Owners manage the budget, contractors view their payments. Everything in one place.', btnOwner:"I'm a house owner", btnContractor:"I'm a contractor", heroNote:'Contractors sign in with phone number and PIN — no email required.',
+        ownerAuthTitle:'Owner Login', ownerAuthDesc:'Sign in or create an account.', loginBtn:'Log In', signupBtn:'Sign Up', cancelBtn:'← Back',
+        contractorAuthTitle:'Contractor Login', contractorAuthDesc:"Enter the owner's email, your phone and PIN.", ownerEmailLbl:"Owner's Email", cPhoneLbl:'Phone Number', cPinLbl:'PIN',
+        dashTitle:'Project Dashboard', dashDesc:'Budget, expenses, payments — all in one place.', refreshBtn:'Refresh',
+        tabDashboard:'Dashboard', tabAddExpense:'Add Expense', tabHistory:'History', tabLaluAdvance:'Lalu Advance', tabSettings:'Settings',
+        lblBudget:'Total Budget', lblSpent:'Total Spent', lblContractor:'Work Payments', lblMaterial:'Material', lblLaluBal:'Lalu Advance Balance',
+        visualBudgetTitle:'Budget Progress', visualBudgetDesc:'How much of the project budget is used.', usedLbl:'Used', spentLbl:'Spent', remainingLbl:'Remaining', budgetLbl:'Budget',
+        visualCatTitle:'Category Split', visualCatDesc:'Where the money is going.',
+        trendTitle:'Last 7 Days', trendDesc:'Daily spending for the most recent week.',
+        recentTitle:'Recent Expenses',
+        thDate:'Date', thCat:'Category', thDesc:'Description', thPaidTo:'Paid To', thAmount:'Amount', thActions:'Actions', thPayMode:'Mode', thProof:'Proof',
+        addExpTitle:'Add Expense', addExpDesc:'Record a contractor payment or construction expense.',
+        editExpTitle:'Edit Expense', editExpDesc:'Update the expense and save changes.',
+        lblDate:'Date', lblTime:'Time', lblEntryKind:'Entry Type', lblPaidBy:'Paid By', lblCategory:'Category', lblAmount:'Amount (₹)', lblPayMode:'Payment Mode', lblAdvParty:'Advance Holder', lblDesc:'Description', lblPaidTo:'Paid To', lblBill:'Bill / Screenshot',
+        selEntryKind:'Select type', selPaidBy:'Select payer', selCategory:'Select category', selPayMode:'Select mode', selAdvParty:'Select holder',
+        kindDirect:'Direct Expense', kindAdvGiven:'Advance to Lalu', kindAdvSettle:'Expense from Lalu Advance',
+        catMaterial:'Material', catContractor:'Contractor', catEquipment:'Equipment', catMisc:'Miscellaneous', catAdvance:'Advance',
+        modeCash:'Cash', modeBankTransfer:'Bank Transfer', modeCheque:'Cheque',
+        saveExpBtn:'Save Expense', updateExpBtn:'Update Expense', cancelEditBtn:'Cancel Edit', clearFormBtn:'Clear Form',
+        hintDirect:'Use for direct payments — materials, contractors, equipment, or other work.', hintAdvGiven:'Use when handing advance cash to Lalu for site work.', hintAdvSettle:"Use when Lalu spent from his advance and you're recording the actual expense.",
+        historyTitle:'Expense History', historyDesc:'All saved expenses in reverse chronological order.',
+        laluTitle:'Lalu Advance Ledger', laluDesc:'Advances given to Lalu, what he spent, and the running balance.',
+        laluGivenLbl:'Total Advance Given', laluSpentLbl:'Paid by Lalu',
+        laluInflow:'Advance Given', laluOutflow:'Paid by Lalu', laluRunBal:'Running Balance',
+        setBudgetTitle:'Set Total Budget', setBudgetLbl:'Budget Amount (₹)', saveBudgetBtn:'Save Budget',
+        addContractorTitle:'Add / Update Contractor', cNameLbl:'Name', cPinLbl2:'Login PIN', cWorkLbl:'Work Type', cAgreedLbl:'Agreed Amount (₹)', saveContractorBtn:'Save Contractor',
+        cDashDesc:'Payments recorded for your work.', cTotalLbl:'Total Received',
+        editAction:'Edit', deleteAction:'Delete', viewProof:'View Proof',
+        paidToLbl:'Paid To', paidByLbl:'Paid By', typeLbl:'Type', modeLbl:'Mode', advPartyLbl:'Advance Holder',
+        confirmDelete:'Delete this expense permanently?',
+        noCatData:'Add expenses to see category breakdown.', noTrendData:'Spending trend will appear once expenses are added.', noExpenses:'No expenses recorded yet.', noPayments:'No payments recorded for this contractor.',
+        expSaved:'Expense saved.', expUpdated:'Expense updated.', expDeleted:'Expense deleted.', budgetSaved:'Budget updated.', contractorSaved:'Contractor saved.', deleting:'Deleting…', saving:'Saving…', updating:'Updating…',
+        laluEmpty:'No Lalu advance entries recorded yet.',
+        openBill:'Open Bill'
       },
       hi: {
-        kickerText:'निर्माण प्रबंधन', heroTitle:'खर्चों को ट्रैक करें।\nबेहतर बनाएं।', heroSubtitle:'मालिक बजट प्रबंधित करते हैं, ठेकेदार अपने भुगतान देखते हैं। सब कुछ एक जगह, कोई ऐप डाउनलोड की आवश्यकता नहीं।', btnOwner:'मैं घर का मालिक हूँ', btnContractor:'मैं एक ठेकेदार हूँ', heroDisclaimer:'ठेकेदार फोन नंबर और पिन के साथ साइन इन करते हैं - किसी ईमेल की आवश्यकता नहीं है।',
-        ownerAuthTitle:'मालिक लॉगिन', ownerAuthDesc:'साइन इन करें या खाता बनाएं।', signupBtn:'साइन अप करें', cancelBtn:'रद्द करें',
-        contractorAuthTitle:'ठेकेदार लॉगिन', contractorAuthDesc:'मालिक का ईमेल, अपना फोन नंबर और पिन दर्ज करें।', loginBtn:'लॉगिन करें',
-        summaryTitle:'प्रोजेक्ट अवलोकन', budgetLabel:'कुल बजट', spentLabel:'कुल खर्च', pendingLabel:'बाकी', burnTitle:'बजट प्रगति',
-        addExpenseTitle:'नया खर्च दर्ज करें', expenseType:'श्रेणी', materialOpt:'सामग्री', labourOpt:'मजदूरी', transportOpt:'परिवहन', miscOpt:'अन्य', amountLabel:'राशि', vendorLabel:'ठेकेदार / विक्रेता', dateLabel:'तारीख', notesLabel:'विवरण', proofLabel:'भुगतान प्रमाण', saveExpense:'खर्च सेव करें',
-        manageContractorsTitle:'ठेकेदार प्रोफ़ाइल जोड़ें', manageContractorsDesc:'ठेकेदार को भुगतान इतिहास देखने के लिए एक प्रोफ़ाइल बनाएं।', cNameLabel:'नाम', cPhoneLabel:'फ़ोन नंबर', cPinLabel:'लॉगिन पिन', saveContractorBtn:'ठेकेदार सेव करें',
-        cDashLead:'यहां आपके काम के लिए दर्ज किए गए भुगतानों का इतिहास है।', thDate:'तारीख', thWork:'काम/विवरण', thAmount:'राशि', thStatus:'स्थिति', paid:'भुगतान हो गया'
+        kicker:'निर्माण प्रबंधन', heroTitle:'खर्चों को ट्रैक करें।\nबेहतर बनाएं।', heroSub:'मालिक बजट प्रबंधित करते हैं, ठेकेदार अपने भुगतान देखते हैं।', btnOwner:'मैं घर का मालिक हूँ', btnContractor:'मैं एक ठेकेदार हूँ', heroNote:'ठेकेदार फोन नंबर और पिन से साइन इन करते हैं।',
+        ownerAuthTitle:'मालिक लॉगिन', ownerAuthDesc:'साइन इन करें या खाता बनाएं।', loginBtn:'लॉगिन', signupBtn:'साइन अप', cancelBtn:'← वापस',
+        contractorAuthTitle:'ठेकेदार लॉगिन', contractorAuthDesc:'मालिक का ईमेल, फोन और पिन दर्ज करें।', ownerEmailLbl:'मालिक का ईमेल', cPhoneLbl:'फोन नंबर', cPinLbl:'पिन',
+        dashTitle:'प्रोजेक्ट डैशबोर्ड', dashDesc:'बजट, खर्च, भुगतान — सब एक जगह।', refreshBtn:'रिफ्रेश',
+        tabDashboard:'डैशबोर्ड', tabAddExpense:'खर्च जोड़ें', tabHistory:'हिस्ट्री', tabLaluAdvance:'लालू एडवांस', tabSettings:'सेटिंग्स',
+        lblBudget:'कुल बजट', lblSpent:'कुल खर्च', lblContractor:'कार्य भुगतान', lblMaterial:'सामग्री', lblLaluBal:'लालू एडवांस बैलेंस',
+        visualBudgetTitle:'बजट प्रगति', visualBudgetDesc:'बजट का कितना हिस्सा इस्तेमाल हो चुका है।', usedLbl:'इस्तेमाल', spentLbl:'खर्च', remainingLbl:'बाकी', budgetLbl:'बजट',
+        visualCatTitle:'श्रेणी विभाजन', visualCatDesc:'पैसा कहाँ जा रहा है।',
+        trendTitle:'पिछले 7 दिन', trendDesc:'हाल के सप्ताह का रोज़ाना खर्च।',
+        recentTitle:'हाल के खर्च',
+        thDate:'तारीख', thCat:'श्रेणी', thDesc:'विवरण', thPaidTo:'किसे', thAmount:'राशि', thActions:'एक्शन', thPayMode:'तरीका', thProof:'प्रूफ',
+        addExpTitle:'खर्च जोड़ें', addExpDesc:'ठेकेदार भुगतान या निर्माण खर्च दर्ज करें।',
+        editExpTitle:'खर्च एडिट करें', editExpDesc:'विवरण बदलें और सेव करें।',
+        lblDate:'तारीख', lblTime:'समय', lblEntryKind:'एंट्री प्रकार', lblPaidBy:'किसने भुगतान किया', lblCategory:'श्रेणी', lblAmount:'राशि (₹)', lblPayMode:'भुगतान तरीका', lblAdvParty:'एडवांस होल्डर', lblDesc:'विवरण', lblPaidTo:'किसे भुगतान', lblBill:'बिल / स्क्रीनशॉट',
+        selEntryKind:'प्रकार चुनें', selPaidBy:'भुगतानकर्ता चुनें', selCategory:'श्रेणी चुनें', selPayMode:'तरीका चुनें', selAdvParty:'होल्डर चुनें',
+        kindDirect:'सीधा खर्च', kindAdvGiven:'लालू को एडवांस', kindAdvSettle:'लालू के एडवांस से खर्च',
+        catMaterial:'सामग्री', catContractor:'ठेकेदार', catEquipment:'उपकरण', catMisc:'विविध', catAdvance:'एडवांस',
+        modeCash:'नकद', modeBankTransfer:'बैंक ट्रांसफर', modeCheque:'चेक',
+        saveExpBtn:'खर्च सेव करें', updateExpBtn:'खर्च अपडेट करें', cancelEditBtn:'एडिट रद्द करें', clearFormBtn:'फॉर्म साफ करें',
+        hintDirect:'सामग्री, ठेकेदार, उपकरण के लिए सामान्य भुगतान।', hintAdvGiven:'जब लालू को साइट के काम के लिए पैसे दें।', hintAdvSettle:'जब लालू एडवांस से खर्च कर चुका हो।',
+        historyTitle:'खर्च हिस्ट्री', historyDesc:'सभी खर्च नवीनतम क्रम में।',
+        laluTitle:'लालू एडवांस लेजर', laluDesc:'लालू को दिए एडवांस, उसके खर्च और बैलेंस।',
+        laluGivenLbl:'कुल दिया एडवांस', laluSpentLbl:'लालू द्वारा भुगतान',
+        laluInflow:'दिया गया एडवांस', laluOutflow:'लालू द्वारा खर्च', laluRunBal:'चलता बैलेंस',
+        setBudgetTitle:'कुल बजट सेट करें', setBudgetLbl:'बजट राशि (₹)', saveBudgetBtn:'बजट सेव करें',
+        addContractorTitle:'ठेकेदार जोड़ें / अपडेट करें', cNameLbl:'नाम', cPinLbl2:'लॉगिन पिन', cWorkLbl:'काम का प्रकार', cAgreedLbl:'तय राशि (₹)', saveContractorBtn:'ठेकेदार सेव करें',
+        cDashDesc:'आपके काम के लिए दर्ज भुगतानों का इतिहास।', cTotalLbl:'कुल प्राप्त',
+        editAction:'एडिट', deleteAction:'हटाएं', viewProof:'प्रूफ देखें',
+        paidToLbl:'किसे', paidByLbl:'किसने', typeLbl:'प्रकार', modeLbl:'तरीका', advPartyLbl:'एडवांस होल्डर',
+        confirmDelete:'इस खर्च को हमेशा के लिए हटाएं?',
+        noCatData:'श्रेणी विभाजन के लिए खर्च जोड़ें।', noTrendData:'खर्च जुड़ने पर रुझान दिखेगा।', noExpenses:'अभी तक कोई खर्च दर्ज नहीं।', noPayments:'इस ठेकेदार के लिए कोई भुगतान नहीं।',
+        expSaved:'खर्च सेव हो गया।', expUpdated:'खर्च अपडेट हो गया।', expDeleted:'खर्च हट गया।', budgetSaved:'बजट अपडेट हो गया।', contractorSaved:'ठेकेदार सेव हो गया।', deleting:'हटाया जा रहा है…', saving:'सेव हो रहा है…', updating:'अपडेट हो रहा है…',
+        laluEmpty:'लालू एडवांस की कोई एंट्री नहीं।',
+        openBill:'बिल खोलें'
       }
     };
-    
-    let lang = 'en';
-    let theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', theme);
 
-    function applyLang(){
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.dataset.i18n;
-        if (i18n[lang][key]) {
-          if (key === 'heroTitle') {
-            el.innerHTML = i18n[lang][key].replace('\n', '<br>');
-          } else {
-            el.textContent = i18n[lang][key];
-          }
-        }
-      });
-      document.querySelector('[data-lang-toggle]').textContent = lang === 'en' ? 'हिंदी' : 'English';
-      document.documentElement.lang = lang === 'en' ? 'en' : 'hi';
+    // ─── STATE ───────────────────────────────────────────────────────────────
+    const state = {
+      lang: 'en',
+      theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
+      supabase: null,
+      currentUser: null,
+      contractors: [],
+      expenses: [],
+      summary: { totalBudget: 0, total: 0, Contractor: 0, Material: 0, Equipment: 0, Miscellaneous: 0, laluAdvanceBalance: 0 },
+      recentExpenses: [],
+      editingId: '',
+      editingScreenshotUrl: '',
+      manualPaidBy: '',
+      deletingId: '',
+      bannerTimer: null
+    };
+
+    // ─── HELPERS ─────────────────────────────────────────────────────────────
+    const $ = id => document.getElementById(id);
+    const t = k => (I18N[state.lang][k] || I18N.en[k] || k);
+    const fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
+    const money = v => fmt.format(Number(v || 0));
+    const compact = v => {
+      const n = Math.abs(Number(v || 0));
+      const f = new Intl.NumberFormat(state.lang === 'hi' ? 'hi-IN' : 'en-IN', { notation: 'compact', maximumFractionDigits: 1 });
+      return (Number(v) < 0 ? '-' : '') + '₹' + f.format(n);
+    };
+    const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    const pad = n => String(n).padStart(2,'0');
+    const fmtDateInput = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    const fmtTimeInput = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+    function splitDateTime(raw) {
+      const s = String(raw || '').trim();
+      if (!s) return { date: '', time: '' };
+      if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return { date: s, time: '' };
+      if (/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}/.test(s)) return { date: s.slice(0,10), time: s.slice(11,16) };
+      const p = new Date(s);
+      if (!isNaN(p)) return { date: fmtDateInput(p), time: (s.includes('T') || /\d{2}:\d{2}/.test(s)) ? fmtTimeInput(p) : '' };
+      return { date: s.slice(0,10), time: '' };
     }
 
-    document.querySelector('[data-lang-toggle]').addEventListener('click', () => { lang = lang === 'en' ? 'hi' : 'en'; applyLang(); });
-    document.querySelector('[data-theme-toggle]').addEventListener('click', () => { theme = theme === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', theme); });
-    applyLang();
+    function fmtDateTime(raw) {
+      const { date, time } = splitDateTime(raw);
+      if (!date) return '—';
+      return time ? `${date} ${time}` : date;
+    }
 
-    // --- SUPABASE SETUP ---
-    let supabase = null;
-    let currentUser = null;
+    function buildDateTime(date, time) {
+      if (!date) return '';
+      return time ? `${date}T${time}` : date;
+    }
 
+    function mapExpense(r) {
+      return {
+        ID: r.id, Date: r.expense_at || '', Category: r.category || '',
+        Description: r.description || '', Amount: Number(r.amount || 0),
+        PaymentMode: r.payment_mode || '', PaidTo: r.paid_to || '',
+        ScreenshotUrl: r.screenshot_url || '', CreatedAt: r.created_at || '',
+        PaidBy: r.paid_by || '', EntryKind: r.entry_kind || 'DirectExpense',
+        AdvanceParty: r.advance_party || ''
+      };
+    }
+
+    function sortDesc(rows) {
+      return rows.slice().sort((a, b) => {
+        const ts = r => {
+          const raw = String(r.Date || '').trim();
+          const d = raw ? new Date(raw) : null;
+          if (d && !isNaN(d)) return d.getTime();
+          const c = new Date(r.CreatedAt || 0);
+          return isNaN(c) ? 0 : c.getTime();
+        };
+        return ts(b) - ts(a);
+      });
+    }
+
+    function countsTowardSpend(e) { return !!(e && e.EntryKind !== 'AdvanceGiven'); }
+
+    function catLabel(cat) {
+      return { Material: t('catMaterial'), Contractor: t('catContractor'), Equipment: t('catEquipment'), Miscellaneous: t('catMisc'), Advance: t('catAdvance') }[cat] || cat || '—';
+    }
+
+    function kindLabel(ek) {
+      return { DirectExpense: t('kindDirect'), AdvanceGiven: t('kindAdvGiven'), AdvanceSettlement: t('kindAdvSettle') }[ek] || t('kindDirect');
+    }
+
+    // ─── BANNER ──────────────────────────────────────────────────────────────
+    function showBanner(msg, tone = 'info') {
+      const b = $('banner');
+      if (state.bannerTimer) clearTimeout(state.bannerTimer);
+      b.textContent = msg;
+      b.className = tone;
+      b.style.display = 'block';
+      if (tone !== 'error') state.bannerTimer = setTimeout(() => { b.style.display = 'none'; }, 3500);
+    }
+
+    function hideBanner() { $('banner').style.display = 'none'; }
+
+    // ─── THEME / LANG ────────────────────────────────────────────────────────
+    function toggleTheme() {
+      state.theme = state.theme === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', state.theme);
+    }
+
+    function toggleLang() {
+      state.lang = state.lang === 'en' ? 'hi' : 'en';
+      applyLang();
+      renderAll();
+    }
+
+    function applyLang() {
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const k = el.dataset.i18n;
+        const v = I18N[state.lang][k] || I18N.en[k];
+        if (!v) return;
+        if (k === 'heroTitle') { el.innerHTML = esc(v).replace('\n','<br>'); } else { el.textContent = v; }
+      });
+      document.documentElement.lang = state.lang;
+    }
+
+    // ─── VIEWS ───────────────────────────────────────────────────────────────
+    function showView(id) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      const el = $(id);
+      if (el) el.classList.add('active');
+      const isDash = id === 'owner-dashboard-view' || id === 'contractor-dashboard-view';
+      $('logoutBtn').style.display = isDash ? 'inline-flex' : 'none';
+      hideBanner();
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+
+    // ─── TABS ────────────────────────────────────────────────────────────────
+    const TAB_NAMES = ['dashboard','addExpense','history','laluAdvance','settings'];
+
+    function switchTab(name) {
+      TAB_NAMES.forEach(n => {
+        $(`tab-${n}`).classList.toggle('active', n === name);
+        $(`tab-${n}Btn`).classList.toggle('active', n === name);
+      });
+      hideBanner();
+    }
+
+    // ─── SUPABASE INIT ───────────────────────────────────────────────────────
     async function initSupabase() {
       try {
         const res = await fetch('/api/config');
         const cfg = await res.json();
         if (cfg.supabaseUrl && cfg.supabaseAnonKey) {
-          supabase = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
-          // Check session
-          const { data } = await supabase.auth.getSession();
+          state.supabase = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+          const { data } = await state.supabase.auth.getSession();
           if (data.session) {
-            currentUser = data.session.user;
+            state.currentUser = data.session.user;
             showView('owner-dashboard-view');
-            loadOwnerDashboard();
+            await loadOwnerData();
           }
-        } else {
-          console.error("Missing Supabase configuration");
         }
-      } catch (e) {
-        console.error("Could not fetch config:", e);
-      }
-    }
-    initSupabase();
-
-    // --- VIEW MANAGEMENT ---
-    function showView(viewId) {
-      try {
-        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-        const targetView = document.getElementById(viewId);
-        if (targetView) {
-          targetView.classList.add('active');
-        } else {
-          console.error("View not found:", viewId);
-        }
-        
-        const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn) {
-          logoutBtn.style.display = (viewId === 'owner-dashboard-view' || viewId === 'contractor-dashboard-view') ? 'inline-flex' : 'none';
-        }
-      } catch (e) {
-        console.error("showView Error:", e);
-      }
+      } catch (e) { console.error('Supabase init failed:', e); }
     }
 
-    async function logout() {
-      if (supabase && currentUser) {
-        await supabase.auth.signOut();
-        currentUser = null;
-      }
-      showView('landing-view');
-    }
-
-    // --- OWNER LOGIC ---
+    // ─── OWNER AUTH ──────────────────────────────────────────────────────────
     async function loginOwner() {
-      if (!supabase) return alert('System initializing...');
-      const email = document.getElementById('ownerEmail').value;
-      const password = document.getElementById('ownerPassword').value;
-      if (!email || !password) return;
-      
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        alert('Login failed: ' + error.message);
-      } else {
-        currentUser = data.user;
-        showView('owner-dashboard-view');
-        loadOwnerDashboard();
-      }
+      const sb = state.supabase;
+      if (!sb) return;
+      const email = $('ownerEmail').value.trim();
+      const pass = $('ownerPassword').value;
+      if (!email || !pass) { $('ownerAuthMsg').textContent = 'Email and password required.'; return; }
+      $('ownerAuthMsg').textContent = 'Logging in…';
+      const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+      if (error) { $('ownerAuthMsg').textContent = error.message; return; }
+      state.currentUser = data.user;
+      $('ownerAuthMsg').textContent = '';
+      showView('owner-dashboard-view');
+      await loadOwnerData();
     }
 
     async function signupOwner() {
-      if (!supabase) return alert('System initializing...');
-      const email = document.getElementById('ownerEmail').value;
-      const password = document.getElementById('ownerPassword').value;
-      if (!email || !password) return;
-
-      const { data, error } = await supabase.auth.signUp({ email, password });
-      if (error) {
-        alert('Signup failed: ' + error.message);
-      } else {
-        alert('Signup successful! You can now log in.');
-        loginOwner();
-      }
+      const sb = state.supabase;
+      if (!sb) return;
+      const email = $('ownerEmail').value.trim();
+      const pass = $('ownerPassword').value;
+      if (!email || !pass) { $('ownerAuthMsg').textContent = 'Email and password required.'; return; }
+      $('ownerAuthMsg').textContent = 'Creating account…';
+      const { error } = await sb.auth.signUp({ email, password: pass });
+      if (error) { $('ownerAuthMsg').textContent = error.message; return; }
+      $('ownerAuthMsg').textContent = 'Account created! Logging in…';
+      await loginOwner();
     }
 
-    async function loadOwnerDashboard() {
-      if (!supabase || !currentUser) return;
-      
-      // Fetch budget
-      const { data: settings } = await supabase.from('hc_settings').select('*');
-      let totalBudget = 1200000;
-      if (settings) {
-        const bSet = settings.find(s => s.key === 'TOTAL_BUDGET');
-        if (bSet) totalBudget = Number(bSet.value) || totalBudget;
-      }
-
-      // Fetch expenses
-      const { data: expenses } = await supabase.from('hc_expenses').select('*');
-      const totalSpent = (expenses || []).reduce((sum, e) => sum + Number(e.amount), 0);
-
-      document.getElementById('valTotalBudget').textContent = `₹${totalBudget.toLocaleString('en-IN')}`;
-      document.getElementById('valSpent').textContent = `₹${totalSpent.toLocaleString('en-IN')}`;
-      document.getElementById('valPending').textContent = `₹${(totalBudget - totalSpent).toLocaleString('en-IN')}`;
-      
-      const burn = totalBudget ? Math.min(100, Math.round((totalSpent / totalBudget) * 100)) : 0;
-      document.getElementById('valBurnBar').style.width = `${burn}%`;
-
-      // Fetch contractors for dropdown
-      const { data: contractors } = await supabase.from('hc_contractors').select('*');
-      document.getElementById('vendorSelect').innerHTML = '<option value="">Select Existing...</option>' + 
-        (contractors || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    async function logout() {
+      if (state.supabase && state.currentUser) await state.supabase.auth.signOut();
+      state.currentUser = null;
+      state.expenses = [];
+      state.contractors = [];
+      showView('landing-view');
     }
 
-    async function saveContractor() {
-      if (!supabase || !currentUser) return;
-      const name = document.getElementById('newCName').value;
-      const phone = document.getElementById('newCPhone').value;
-      const pin = document.getElementById('newCPin').value;
-      if (!name || !phone || !pin) return alert('Fill all contractor details');
-      
-      const btn = document.getElementById('saveContractorBtn');
-      btn.disabled = true; btn.textContent = 'Saving...';
-      
-      const { error } = await supabase.from('hc_contractors').insert({ name, phone, pin, work_type: 'Contractor', user_id: currentUser.id });
-      
-      if (error) {
-        alert('Failed to save contractor: ' + error.message);
-      } else {
-        alert('Contractor Saved');
-        document.getElementById('newCName').value = '';
-        document.getElementById('newCPhone').value = '';
-        document.getElementById('newCPin').value = '';
-        loadOwnerDashboard(); // refresh dropdown
-      }
-      btn.disabled = false; btn.textContent = i18n[lang].saveContractorBtn;
-    }
-
-    async function saveExpense() {
-      if (!supabase || !currentUser) return;
-      const category = document.getElementById('expType').value;
-      const amount = document.getElementById('expAmount').value;
-      const paid_to = document.getElementById('vendorSelect').value || document.getElementById('vendorInput').value;
-      const date = document.getElementById('expDate').value || new Date().toISOString().split('T')[0];
-      const description = document.getElementById('expNotes').value || category;
-      
-      if (!amount || !paid_to || !date) return alert('Amount, Vendor, and Date are required.');
-
-      const btn = document.getElementById('saveExpenseBtn');
-      btn.disabled = true; btn.textContent = 'Saving...';
-
-      let screenshot_url = '';
-      const fileInput = document.getElementById('expProof');
-      if (fileInput.files.length > 0) {
-        try {
-          const file = fileInput.files[0];
-          const path = `${currentUser.id}/${Date.now()}_${file.name}`;
-          const { data, error } = await supabase.storage.from('screenshots').upload(path, file);
-          if (!error && data) {
-            const { data: publicData } = supabase.storage.from('screenshots').getPublicUrl(path);
-            screenshot_url = publicData.publicUrl;
-          }
-        } catch(e) { console.error('Image upload failed', e); }
-      }
-
-      const { error } = await supabase.from('hc_expenses').insert({
-        expense_at: date, category, description, amount, payment_mode: 'Cash',
-        paid_to, paid_by: 'Owner', screenshot_url, user_id: currentUser.id
-      });
-      
-      if (error) {
-        alert('Failed to save expense: ' + error.message);
-      } else {
-        alert('Expense saved');
-        document.getElementById('expAmount').value = '';
-        document.getElementById('expNotes').value = '';
-        document.getElementById('expProof').value = '';
-        loadOwnerDashboard(); // refresh summary
-      }
-      
-      btn.disabled = false; btn.textContent = i18n[lang].saveExpense;
-    }
-
-    // --- CONTRACTOR LOGIC ---
+    // ─── CONTRACTOR AUTH ─────────────────────────────────────────────────────
     async function loginContractor() {
-      const ownerEmail = document.getElementById('contractorOwnerEmail').value;
-      const phone = document.getElementById('contractorPhone').value;
-      const pin = document.getElementById('contractorPin').value;
-      if(!ownerEmail || !phone || !pin) return alert('Owner Email, Phone and PIN required');
-
+      const ownerEmail = $('cOwnerEmail').value.trim();
+      const phone = $('cPhone').value.trim();
+      const pin = $('cPin').value.trim();
+      if (!ownerEmail || !phone || !pin) { $('contractorAuthMsg').textContent = 'All fields required.'; return; }
+      $('contractorAuthMsg').textContent = 'Checking…';
       try {
         const res = await fetch('/api/contractorAuth', {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ownerEmail, phone, pin })
         });
-        if(!res.ok) throw new Error('Invalid login');
         const data = await res.json();
-        
+        if (!res.ok) { $('contractorAuthMsg').textContent = data.error || 'Login failed.'; return; }
+        $('contractorAuthMsg').textContent = '';
         showView('contractor-dashboard-view');
-        document.getElementById('cDashTitle').textContent = `Welcome, ${data.contractorName}`;
-        
-        const tbody = document.getElementById('cDashTable');
-        if(data.payments.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No payments found</td></tr>';
-        } else {
-          tbody.innerHTML = data.payments.map(p => `
-            <tr>
-              <td>${p.Date ? p.Date.split('T')[0] : ''}</td>
-              <td>${p.Description}</td>
-              <td>₹${p.Amount.toLocaleString('en-IN')}</td>
-              <td><span class="tag tag-paid" data-i18n="paid">${i18n[lang].paid}</span></td>
-            </tr>
-          `).join('');
+        renderContractorDashboard(data);
+      } catch (e) { $('contractorAuthMsg').textContent = 'Network error. Please try again.'; }
+    }
+
+    function renderContractorDashboard(data) {
+      $('cDashTitle').textContent = `Welcome, ${data.contractorName}`;
+      $('cTotalVal').textContent = money(data.total || 0);
+      const payments = data.payments || [];
+      $('cPaymentsBody').innerHTML = payments.length
+        ? payments.map(p => `<tr>
+            <td>${esc(fmtDateTime(p.Date))}</td>
+            <td>${esc(p.Description)}</td>
+            <td>${money(p.Amount)}</td>
+            <td>${esc(p.PaymentMode || '—')}</td>
+            <td>${p.ScreenshotUrl ? `<a href="${esc(p.ScreenshotUrl)}" target="_blank" rel="noreferrer" class="btn btn-ghost btn-sm">${esc(t('viewProof'))}</a>` : '—'}</td>
+          </tr>`).join('')
+        : `<tr><td colspan="5" class="muted" style="text-align:center">${esc(t('noPayments'))}</td></tr>`;
+    }
+
+    // ─── DATA LOADING ────────────────────────────────────────────────────────
+    async function loadOwnerData() {
+      try {
+        const sb = state.supabase;
+        const [expRes, setRes, conRes] = await Promise.all([
+          sb.from('hc_expenses').select('*').order('created_at', { ascending: false }),
+          sb.from('hc_settings').select('*'),
+          sb.from('hc_contractors').select('*').order('name')
+        ]);
+        if (expRes.error) throw expRes.error;
+        if (setRes.error) throw setRes.error;
+        if (conRes.error) throw conRes.error;
+
+        state.expenses = (expRes.data || []).map(mapExpense);
+        state.contractors = (conRes.data || []).map(r => ({
+          Name: r.name, Phone: r.phone || '', WorkType: r.work_type || '', AgreedAmount: Number(r.agreed_amount || 0)
+        }));
+
+        const settingsMap = Object.fromEntries((setRes.data || []).map(r => [r.key, r.value]));
+        const totalBudget = Number(settingsMap['TOTAL_BUDGET'] || 0);
+
+        // Compute summary
+        let total = 0, Contractor = 0, Material = 0, Equipment = 0, Miscellaneous = 0, laluAdvanceBalance = 0;
+        for (const e of state.expenses) {
+          const ek = e.EntryKind;
+          const amt = e.Amount;
+          const adv = String(e.AdvanceParty || e.PaidTo || '').toLowerCase();
+          if (ek === 'AdvanceGiven') { if (adv === 'lalu') laluAdvanceBalance += amt; continue; }
+          if (ek === 'AdvanceSettlement' && adv === 'lalu') laluAdvanceBalance -= amt;
+          total += amt;
+          if (e.Category === 'Contractor') Contractor += amt;
+          else if (e.Category === 'Material') Material += amt;
+          else if (e.Category === 'Equipment') Equipment += amt;
+          else if (e.Category === 'Miscellaneous') Miscellaneous += amt;
         }
-      } catch(e) {
-        alert('Login failed. Please check your details.');
+
+        state.summary = { totalBudget, total, Contractor, Material, Equipment, Miscellaneous, laluAdvanceBalance };
+        state.recentExpenses = sortDesc(state.expenses).slice(0, 5);
+
+        $('budgetInput').value = totalBudget || '';
+        renderAll();
+      } catch (e) { showBanner(e.message, 'error'); }
+    }
+
+    async function refreshOwnerData() {
+      showBanner('Refreshing…', 'info');
+      await loadOwnerData();
+    }
+
+    // ─── RENDER ALL ──────────────────────────────────────────────────────────
+    function renderAll() {
+      applyLang();
+      renderDashboard();
+      renderHistory();
+      renderLaluAdvance();
+      renderPaidToInput();
+      renderFormMode();
+    }
+
+    // ─── DASHBOARD ───────────────────────────────────────────────────────────
+    function renderDashboard() {
+      const { totalBudget, total, Contractor, Material, laluAdvanceBalance } = state.summary;
+      $('valBudget').textContent = money(totalBudget);
+      $('valSpent').textContent = money(total);
+      $('valContractor').textContent = money(Contractor);
+      $('valMaterial').textContent = money(Material);
+      $('valLaluBal').textContent = money(laluAdvanceBalance);
+
+      // Budget ring
+      const pct = totalBudget > 0 ? Math.min((total / totalBudget) * 100, 100) : 0;
+      const deg = (pct / 100) * 360;
+      $('budgetRing').style.background = `conic-gradient(var(--primary) 0deg,var(--primary) ${deg}deg,var(--primary-hl) ${deg}deg,var(--primary-hl) 360deg)`;
+      $('ringPct').textContent = `${Math.round(pct)}%`;
+      $('ringSpent').textContent = money(total);
+      $('ringRemaining').textContent = money(Math.max(totalBudget - total, 0));
+      $('ringBudget').textContent = money(totalBudget);
+
+      // Category bars
+      const cats = [
+        { key: 'Material', val: state.summary.Material },
+        { key: 'Contractor', val: state.summary.Contractor },
+        { key: 'Equipment', val: state.summary.Equipment },
+        { key: 'Miscellaneous', val: state.summary.Miscellaneous }
+      ];
+      const catMax = Math.max(...cats.map(c => c.val), 1);
+      const catTotal = cats.reduce((s, c) => s + c.val, 0);
+      $('categoryBars').innerHTML = catTotal > 0
+        ? cats.map(c => {
+            const w = (c.val / catMax) * 100;
+            const share = catTotal > 0 ? Math.round((c.val / catTotal) * 100) : 0;
+            return `<div class="bar-row"><div class="bar-meta"><span>${esc(catLabel(c.key))}</span><strong>${money(c.val)} · ${share}%</strong></div><div class="bar-track"><div class="bar-fill" style="width:${w}%"></div></div></div>`;
+          }).join('')
+        : `<div class="visual-empty">${esc(t('noCatData'))}</div>`;
+
+      // 7-day trend
+      const anchor = (() => {
+        const ts = state.expenses.map(e => { const d = new Date(splitDateTime(e.Date).date + 'T00:00:00'); return isNaN(d) ? 0 : d.getTime(); }).filter(Boolean);
+        return ts.length ? new Date(Math.max(...ts)) : new Date();
+      })();
+      const amtByDay = new Map();
+      state.expenses.forEach(e => {
+        if (!countsTowardSpend(e)) return;
+        const { date } = splitDateTime(e.Date);
+        if (date) amtByDay.set(date, (amtByDay.get(date) || 0) + e.Amount);
+      });
+      const trendRows = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(anchor); d.setDate(d.getDate() + i - 6);
+        const key = fmtDateInput(d);
+        return { key, amount: amtByDay.get(key) || 0, label: new Intl.DateTimeFormat(state.lang === 'hi' ? 'hi-IN' : 'en-IN', { day:'2-digit', month:'short' }).format(d) };
+      });
+      const trendMax = Math.max(...trendRows.map(r => r.amount), 1);
+      $('spendTrend').innerHTML = trendRows.some(r => r.amount > 0)
+        ? trendRows.map(r => {
+            const h = Math.max((r.amount / trendMax) * 100, r.amount > 0 ? 8 : 0);
+            return `<div class="trend-day"><div class="trend-amt">${r.amount > 0 ? esc(compact(r.amount)) : ''}</div><div class="trend-col-wrap"><div class="trend-col" style="height:${h}%;opacity:${r.amount > 0 ? 1 : 0.2}"></div></div><div class="trend-lbl">${esc(r.label)}</div></div>`;
+          }).join('')
+        : `<div class="visual-empty" style="grid-column:1/-1">${esc(t('noTrendData'))}</div>`;
+
+      // Recent expenses table
+      $('recentBody').innerHTML = state.recentExpenses.length
+        ? state.recentExpenses.map(e => `<tr>
+            <td>${esc(fmtDateTime(e.Date))}</td>
+            <td>${esc(catLabel(e.Category))}</td>
+            <td><div>${esc(e.Description)}</div><div class="muted" style="font-size:.78rem;margin-top:.2rem">${esc(t('typeLbl'))}: ${esc(kindLabel(e.EntryKind))} · ${esc(t('paidByLbl'))}: ${esc(e.PaidBy||'—')}</div></td>
+            <td>${esc(e.PaidTo)}</td>
+            <td>${money(e.Amount)}</td>
+            <td>${renderExpenseActions(e)}</td>
+          </tr>`).join('')
+        : `<tr><td colspan="6" class="muted" style="text-align:center">${esc(t('noExpenses'))}</td></tr>`;
+    }
+
+    // ─── HISTORY ─────────────────────────────────────────────────────────────
+    function renderHistory() {
+      $('historyList').innerHTML = state.expenses.length
+        ? sortDesc(state.expenses).map(e => historyItem(e)).join('')
+        : `<div class="history-item muted">${esc(t('noExpenses'))}</div>`;
+    }
+
+    function historyItem(e) {
+      return `<div class="history-item">
+        <strong>${esc(fmtDateTime(e.Date))} · ${esc(catLabel(e.Category))} · ${money(e.Amount)}</strong>
+        <div>${esc(e.Description)}</div>
+        <div class="history-meta">${esc(t('paidToLbl'))}: ${esc(e.PaidTo||'—')} · ${esc(t('paidByLbl'))}: ${esc(e.PaidBy||'—')} · ${esc(t('typeLbl'))}: ${esc(kindLabel(e.EntryKind))}${e.AdvanceParty ? ` · ${esc(t('advPartyLbl'))}: ${esc(e.AdvanceParty)}` : ''} · ${esc(t('modeLbl'))}: ${esc(e.PaymentMode||'—')}</div>
+        <div class="history-actions">
+          ${e.ScreenshotUrl ? `<a href="${esc(e.ScreenshotUrl)}" target="_blank" rel="noreferrer" class="btn btn-secondary btn-sm">${esc(t('openBill'))}</a>` : ''}
+          ${renderExpenseActions(e)}
+        </div>
+      </div>`;
+    }
+
+    function renderExpenseActions(e) {
+      if (!e?.ID) return '';
+      const isDel = state.deletingId === e.ID;
+      return `<div class="gap-sm">
+        <button class="btn btn-secondary btn-sm" onclick="startEdit('${esc(e.ID)}')">${esc(t('editAction'))}</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteExpense('${esc(e.ID)}')" ${isDel ? 'disabled' : ''}>${esc(isDel ? t('deleting') : t('deleteAction'))}</button>
+      </div>`;
+    }
+
+    // ─── LALU ADVANCE ────────────────────────────────────────────────────────
+    function isLaluEntry(e) {
+      if (!e) return false;
+      const ek = e.EntryKind, adv = String(e.AdvanceParty || '').toLowerCase(), pt = String(e.PaidTo || '').toLowerCase(), pb = String(e.PaidBy || '').toLowerCase();
+      if (ek === 'AdvanceGiven') return adv === 'lalu' || pt === 'lalu';
+      if (ek === 'AdvanceSettlement') return adv === 'lalu' || pb === 'lalu';
+      return false;
+    }
+
+    function renderLaluAdvance() {
+      const rows = sortDesc(state.expenses).filter(isLaluEntry);
+      const chrono = rows.slice().reverse();
+      let running = 0;
+      const enriched = chrono.map(e => {
+        running += e.EntryKind === 'AdvanceGiven' ? e.Amount : -e.Amount;
+        return { ...e, runningBalance: running };
+      }).reverse();
+
+      const given = enriched.filter(e => e.EntryKind === 'AdvanceGiven').reduce((s, e) => s + e.Amount, 0);
+      const spent = enriched.filter(e => e.EntryKind === 'AdvanceSettlement').reduce((s, e) => s + e.Amount, 0);
+      $('laluGiven').textContent = money(given);
+      $('laluSpent').textContent = money(spent);
+      $('laluBalance').textContent = money(state.summary.laluAdvanceBalance);
+
+      $('laluList').innerHTML = enriched.length
+        ? enriched.map(e => {
+            const isIn = e.EntryKind === 'AdvanceGiven';
+            return `<div class="history-item">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.75rem;flex-wrap:wrap">
+                <strong>${esc(fmtDateTime(e.Date))} · ${esc(kindLabel(e.EntryKind))} · ${money(e.Amount)}</strong>
+                <div class="gap-sm">
+                  <span class="pill ${isIn ? 'pill-in' : 'pill-out'}">${esc(t(isIn ? 'laluInflow' : 'laluOutflow'))}</span>
+                  <span class="pill pill-bal">${esc(t('laluRunBal'))}: ${money(e.runningBalance)}</span>
+                </div>
+              </div>
+              <div style="margin-top:.4rem">${esc(e.Description||'—')}</div>
+              <div class="history-meta">${esc(t('paidToLbl'))}: ${esc(e.PaidTo||'—')} · ${esc(t('paidByLbl'))}: ${esc(e.PaidBy||'—')} · ${esc(t('modeLbl'))}: ${esc(e.PaymentMode||'—')}</div>
+              <div class="history-actions">
+                ${e.ScreenshotUrl ? `<a href="${esc(e.ScreenshotUrl)}" target="_blank" rel="noreferrer" class="btn btn-secondary btn-sm">${esc(t('openBill'))}</a>` : ''}
+                ${renderExpenseActions(e)}
+              </div>
+            </div>`;
+          }).join('')
+        : `<div class="history-item muted">${esc(t('laluEmpty'))}</div>`;
+    }
+
+    // ─── EXPENSE FORM ────────────────────────────────────────────────────────
+    function syncFormState() {
+      const ek = $('expEntryKind').value;
+      const cat = $('expCategory');
+      const paidBy = $('expPaidBy');
+      const advGroup = $('advPartyGroup');
+      const advSel = $('expAdvParty');
+      const hint = $('flowHint');
+
+      if (ek === 'AdvanceGiven') {
+        advGroup.classList.remove('hidden');
+        if (!advSel.value) advSel.value = 'Lalu';
+        cat.value = 'Advance'; cat.disabled = true;
+        paidBy.disabled = false;
+        if (paidBy.value === 'Lalu') paidBy.value = state.manualPaidBy || '';
+        hint.textContent = t('hintAdvGiven'); hint.classList.remove('hidden');
+      } else if (ek === 'AdvanceSettlement') {
+        advGroup.classList.remove('hidden');
+        if (!advSel.value) advSel.value = 'Lalu';
+        paidBy.value = advSel.value || 'Lalu'; paidBy.disabled = true;
+        cat.disabled = false;
+        if (!cat.value || cat.value === 'Advance') cat.value = 'Material';
+        hint.textContent = t('hintAdvSettle'); hint.classList.remove('hidden');
+      } else if (ek === 'DirectExpense') {
+        advGroup.classList.add('hidden'); advSel.value = '';
+        cat.disabled = false; paidBy.disabled = false;
+        if (cat.value === 'Advance') cat.value = '';
+        if (paidBy.value === 'Lalu') paidBy.value = state.manualPaidBy || '';
+        hint.textContent = t('hintDirect'); hint.classList.remove('hidden');
+      } else {
+        advGroup.classList.add('hidden'); advSel.value = '';
+        cat.disabled = false; paidBy.disabled = false;
+        hint.classList.add('hidden'); hint.textContent = '';
+      }
+      renderPaidToInput();
+    }
+
+    function handlePaidByChange() {
+      const v = $('expPaidBy').value;
+      if (v && v !== 'Lalu') state.manualPaidBy = v;
+    }
+
+    function renderPaidToInput() {
+      const ek = $('expEntryKind').value;
+      const cat = $('expCategory').value;
+      const container = $('paidToContainer');
+      const existing = $('expPaidTo');
+      const existingVal = existing ? existing.value : '';
+
+      if (ek === 'AdvanceGiven') {
+        const party = $('expAdvParty').value || 'Lalu';
+        container.innerHTML = `<input id="expPaidTo" type="text" value="${esc(party)}" readonly required />`;
+        return;
+      }
+
+      if (cat === 'Contractor' && state.contractors.length > 0) {
+        const opts = state.contractors.map(c => `<option value="${esc(c.Name)}">${esc(c.Name)}</option>`).join('');
+        container.innerHTML = `<select id="expPaidTo" required><option value="">— Select contractor —</option>${opts}</select>`;
+        const sel = $('expPaidTo');
+        if (existingVal && state.contractors.some(c => c.Name === existingVal)) sel.value = existingVal;
+        else if (state.contractors.length === 1) sel.value = state.contractors[0].Name;
+        return;
+      }
+
+      container.innerHTML = `<input id="expPaidTo" type="text" required placeholder="${esc(t('lblPaidTo'))}" />`;
+      $('expPaidTo').value = existingVal;
+    }
+
+    function renderFormMode() {
+      const isEditing = !!state.editingId;
+      $('expFormTitle').textContent = t(isEditing ? 'editExpTitle' : 'addExpTitle');
+      $('expFormDesc').textContent = t(isEditing ? 'editExpDesc' : 'addExpDesc');
+      const btn = $('saveExpBtn');
+      if (!btn.disabled) btn.textContent = t(isEditing ? 'updateExpBtn' : 'saveExpBtn');
+      $('cancelEditBtn').classList.toggle('hidden', !isEditing);
+
+      const note = $('editBillNote');
+      if (isEditing && state.editingScreenshotUrl) {
+        note.innerHTML = `<a href="${esc(state.editingScreenshotUrl)}" target="_blank" rel="noreferrer" class="btn btn-ghost btn-sm">${esc(t('openBill'))}</a>`;
+        note.classList.remove('hidden');
+      } else {
+        note.textContent = ''; note.classList.add('hidden');
       }
     }
+
+    function setToday() { $('expDate').value = fmtDateInput(new Date()); }
+
+    function clearExpenseForm() {
+      state.editingId = ''; state.editingScreenshotUrl = ''; state.manualPaidBy = '';
+      $('expenseForm').reset();
+      $('expEntryKind').value = ''; $('expPaidBy').value = ''; $('expCategory').value = '';
+      $('expPayMode').value = ''; $('expAdvParty').value = ''; $('expTime').value = '';
+      setToday();
+      syncFormState();
+      renderFormMode();
+    }
+
+    function startEdit(id) {
+      const e = [...state.expenses, ...state.recentExpenses].find(x => x.ID === id);
+      if (!e) { showBanner('Expense not found.', 'error'); return; }
+      state.editingId = e.ID;
+      state.editingScreenshotUrl = e.ScreenshotUrl || '';
+      state.manualPaidBy = e.PaidBy && e.PaidBy !== 'Lalu' ? e.PaidBy : '';
+
+      const { date, time } = splitDateTime(e.Date);
+      switchTab('addExpense');
+      $('expDate').value = date;
+      $('expTime').value = time;
+      $('expEntryKind').value = e.EntryKind || 'DirectExpense';
+      $('expPaidBy').value = e.PaidBy || '';
+      $('expCategory').value = e.Category || '';
+      $('expAmount').value = e.Amount || '';
+      $('expPayMode').value = e.PaymentMode || '';
+      $('expDesc').value = e.Description || '';
+      $('expAdvParty').value = e.AdvanceParty || '';
+      syncFormState();
+
+      const pt = $('expPaidTo');
+      if (pt) {
+        if (pt.tagName === 'SELECT' && e.PaidTo) {
+          if (!Array.from(pt.options).some(o => o.value === e.PaidTo)) {
+            pt.insertAdjacentHTML('beforeend', `<option value="${esc(e.PaidTo)}">${esc(e.PaidTo)}</option>`);
+          }
+        }
+        pt.value = e.PaidTo || '';
+      }
+      $('expProof').value = '';
+      renderFormMode();
+      showBanner('Expense loaded for editing.', 'info');
+    }
+
+    async function saveExpense(event) {
+      event.preventDefault();
+      const sb = state.supabase;
+      if (!sb || !state.currentUser) return;
+
+      const btn = $('saveExpBtn');
+      const isEditing = !!state.editingId;
+      btn.disabled = true;
+      btn.textContent = t(isEditing ? 'updating' : 'saving');
+
+      const ek = $('expEntryKind').value;
+      const advanceParty = ek === 'DirectExpense' ? '' : $('expAdvParty').value;
+      const paidBy = ek === 'AdvanceSettlement' ? (advanceParty || 'Lalu') : $('expPaidBy').value;
+      const paidTo = (ek === 'AdvanceGiven' && advanceParty) ? advanceParty : ($('expPaidTo').value || '').trim();
+
+      try {
+        let screenshotUrl = isEditing ? state.editingScreenshotUrl : '';
+        const file = $('expProof').files[0];
+        if (file) {
+          const path = `${state.currentUser.id}/${Date.now()}_${file.name}`;
+          const { data: up, error: upErr } = await sb.storage.from('screenshots').upload(path, file, { upsert: true });
+          if (upErr) throw upErr;
+          const { data: urlData } = sb.storage.from('screenshots').getPublicUrl(up.path);
+          screenshotUrl = urlData.publicUrl;
+        }
+
+        const payload = {
+          expense_at: buildDateTime($('expDate').value, $('expTime').value),
+          category: $('expCategory').value,
+          description: $('expDesc').value.trim(),
+          amount: Number($('expAmount').value),
+          payment_mode: $('expPayMode').value,
+          paid_to: paidTo,
+          paid_by: paidBy,
+          screenshot_url: screenshotUrl,
+          entry_kind: ek,
+          advance_party: advanceParty
+        };
+
+        if (isEditing) {
+          const { error } = await sb.from('hc_expenses').update(payload).eq('id', state.editingId);
+          if (error) throw error;
+        } else {
+          const { error } = await sb.from('hc_expenses').insert(payload);
+          if (error) throw error;
+        }
+
+        clearExpenseForm();
+        switchTab('addExpense');
+        showBanner(t(isEditing ? 'expUpdated' : 'expSaved'), 'success');
+        await loadOwnerData();
+      } catch (e) {
+        showBanner(e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        renderFormMode();
+      }
+    }
+
+    async function deleteExpense(id) {
+      if (!id || !window.confirm(t('confirmDelete'))) return;
+      state.deletingId = id;
+      renderHistory(); renderLaluAdvance(); renderDashboard();
+      try {
+        const { error } = await state.supabase.from('hc_expenses').delete().eq('id', id);
+        if (error) throw error;
+        if (state.editingId === id) clearExpenseForm();
+        showBanner(t('expDeleted'), 'success');
+        await loadOwnerData();
+      } catch (e) {
+        showBanner(e.message, 'error');
+      } finally {
+        state.deletingId = '';
+        renderHistory(); renderLaluAdvance(); renderDashboard();
+      }
+    }
+
+    // ─── BUDGET & CONTRACTORS ────────────────────────────────────────────────
+    async function saveBudget(event) {
+      event.preventDefault();
+      const amount = Number($('budgetInput').value);
+      try {
+        const { error } = await state.supabase.from('hc_settings')
+          .upsert({ user_id: state.currentUser.id, key: 'TOTAL_BUDGET', value: String(amount) }, { onConflict: 'user_id,key' });
+        if (error) throw error;
+        showBanner(t('budgetSaved'), 'success');
+        await loadOwnerData();
+      } catch (e) { showBanner(e.message, 'error'); }
+    }
+
+    async function saveContractor(event) {
+      event.preventDefault();
+      const name = $('cName').value.trim();
+      if (!name) { showBanner('Contractor name is required.', 'error'); return; }
+      const phone = $('cPhone').value.trim();
+      const pin = $('cPin').value.trim();
+      const work_type = $('cWorkType').value.trim();
+      const agreed_amount = Number($('cAgreedAmount').value) || 0;
+      try {
+        // Upsert by name (case-insensitive check first)
+        const { data: existing } = await state.supabase.from('hc_contractors').select('id').ilike('name', name).maybeSingle();
+        let error;
+        if (existing) {
+          ({ error } = await state.supabase.from('hc_contractors').update({ phone, pin, work_type, agreed_amount }).eq('id', existing.id));
+        } else {
+          ({ error } = await state.supabase.from('hc_contractors').insert({ name, phone, pin, work_type, agreed_amount }));
+        }
+        if (error) throw error;
+        $('cName').value = ''; $('cPhone').value = ''; $('cPin').value = '';
+        $('cWorkType').value = ''; $('cAgreedAmount').value = '';
+        showBanner(t('contractorSaved'), 'success');
+        await loadOwnerData();
+      } catch (e) { showBanner(e.message, 'error'); }
+    }
+
+    // ─── BOOT ────────────────────────────────────────────────────────────────
+    document.documentElement.setAttribute('data-theme', state.theme);
+    applyLang();
+    setToday();
+    syncFormState();
+    initSupabase();
   </script>
 </body>
 </html>
