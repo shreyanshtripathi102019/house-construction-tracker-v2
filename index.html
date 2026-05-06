@@ -284,6 +284,7 @@
           <button class="tab-btn" id="tab-addExpenseBtn" onclick="switchTab('addExpense')" data-i18n="tabAddExpense">Add Expense</button>
           <button class="tab-btn" id="tab-historyBtn" onclick="switchTab('history')" data-i18n="tabHistory">History</button>
           <button class="tab-btn" id="tab-laluAdvanceBtn" onclick="switchTab('laluAdvance')" data-i18n="tabLaluAdvance">Lalu Advance</button>
+          <button class="tab-btn" id="tab-auditLogsBtn" onclick="switchTab('auditLogs')" data-i18n="tabAuditLogs">Audit Logs</button>
           <button class="tab-btn" id="tab-settingsBtn" onclick="switchTab('settings')" data-i18n="tabSettings">Settings</button>
         </div>
       </div>
@@ -391,6 +392,50 @@
                   <option value="Advance" data-i18n="catAdvance">Advance</option>
                 </select>
               </div>
+              
+              <!-- Material Details Group -->
+              <div id="materialGroup" class="form-group full hidden" style="background:var(--surface-2); padding:1rem; border-radius:var(--r-lg); border:1px solid var(--border); margin-bottom:1rem;">
+                <h4 style="font-size:0.9rem; margin-bottom:0.75rem;">Material Details <span class="muted" style="font-weight:400;">(Optional)</span></h4>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="lbl">Material Name</label>
+                    <select id="expMaterialName" onchange="syncFormState()">
+                      <option value="">Select Material</option>
+                      <option value="Cement">Cement</option>
+                      <option value="Steel/Rebar">Steel/Rebar</option>
+                      <option value="Sand">Sand</option>
+                      <option value="Aggregate">Aggregate</option>
+                      <option value="Bricks/Blocks">Bricks/Blocks</option>
+                      <option value="Other">Other...</option>
+                    </select>
+                  </div>
+                  <div class="form-group hidden" id="customMaterialGroup">
+                    <label class="lbl">Custom Material</label>
+                    <input type="text" id="expMaterialCustom" placeholder="e.g. Tiles" />
+                  </div>
+                  <div class="form-group">
+                    <label class="lbl">Quantity</label>
+                    <input type="number" id="expMaterialQty" min="0" step="0.01" oninput="calcMaterialTotal()" placeholder="e.g. 50" />
+                  </div>
+                  <div class="form-group">
+                    <label class="lbl">Unit</label>
+                    <select id="expMaterialUnit">
+                      <option value="">Select Unit</option>
+                      <option value="Bags">Bags</option>
+                      <option value="Kg">Kg</option>
+                      <option value="Tonne">Tonne</option>
+                      <option value="Cft">Cft</option>
+                      <option value="Sqft">Sqft</option>
+                      <option value="Brass">Brass</option>
+                      <option value="Pieces">Pieces</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="lbl">Rate (₹ per Unit)</label>
+                    <input type="number" id="expMaterialRate" min="0" step="0.01" oninput="calcMaterialTotal()" placeholder="e.g. 350" />
+                  </div>
+                </div>
+              </div>
               <div class="form-group">
                 <label class="lbl" data-i18n="lblAmount">Amount (₹)</label>
                 <input type="number" id="expAmount" min="0" step="0.01" required placeholder="e.g. 5000" />
@@ -458,6 +503,28 @@
             <div class="stat"><div class="lbl" data-i18n="lblLaluBal">Balance</div><div class="val" id="laluBalance">₹0</div></div>
           </div>
           <div id="laluList" class="history-list"></div>
+        </div>
+      </div>
+
+      <!-- AUDIT LOGS TAB -->
+      <div id="tab-auditLogs" class="tab-panel">
+        <div class="panel">
+          <h2 style="font-family:var(--font-display); margin-bottom:1rem; font-size:1.4rem;">Audit Logs</h2>
+          <p class="muted" style="margin-bottom:1.5rem;">Tracks all updates and deletions securely.</p>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Action</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="auditLogsBody">
+                <tr><td colspan="3" class="muted" style="text-align:center">Loading audit logs...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -544,7 +611,7 @@
         ownerAuthTitle:'Owner Login', ownerAuthDesc:'Sign in or create an account.', loginBtn:'Log In', signupBtn:'Sign Up', cancelBtn:'← Back',
         contractorAuthTitle:'Contractor Login', contractorAuthDesc:"Enter the owner's email, your phone and PIN.", ownerEmailLbl:"Owner's Email", cPhoneLbl:'Phone Number', cPinLbl:'PIN',
         dashTitle:'Project Dashboard', dashDesc:'Budget, expenses, payments — all in one place.', refreshBtn:'Refresh',
-        tabDashboard:'Dashboard', tabAddExpense:'Add Expense', tabHistory:'History', tabLaluAdvance:'Lalu Advance', tabSettings:'Settings',
+        tabDashboard:'Dashboard', tabAddExpense:'Add Expense', tabHistory:'History', tabLaluAdvance:'Lalu Advance', tabSettings:'Settings', tabAuditLogs:'Audit Logs',
         lblBudget:'Total Budget', lblSpent:'Total Spent', lblContractor:'Work Payments', lblMaterial:'Material', lblLaluBal:'Lalu Advance Balance',
         visualBudgetTitle:'Budget Progress', visualBudgetDesc:'How much of the project budget is used.', usedLbl:'Used', spentLbl:'Spent', remainingLbl:'Remaining', budgetLbl:'Budget',
         visualCatTitle:'Category Split', visualCatDesc:'Where the money is going.',
@@ -582,7 +649,7 @@
         ownerAuthTitle:'मालिक लॉगिन', ownerAuthDesc:'साइन इन करें या खाता बनाएं।', loginBtn:'लॉगिन', signupBtn:'साइन अप', cancelBtn:'← वापस',
         contractorAuthTitle:'ठेकेदार लॉगिन', contractorAuthDesc:'मालिक का ईमेल, फोन और पिन दर्ज करें।', ownerEmailLbl:'मालिक का ईमेल', cPhoneLbl:'फोन नंबर', cPinLbl:'पिन',
         dashTitle:'प्रोजेक्ट डैशबोर्ड', dashDesc:'बजट, खर्च, भुगतान — सब एक जगह।', refreshBtn:'रिफ्रेश',
-        tabDashboard:'डैशबोर्ड', tabAddExpense:'खर्च जोड़ें', tabHistory:'हिस्ट्री', tabLaluAdvance:'लालू एडवांस', tabSettings:'सेटिंग्स',
+        tabDashboard:'डैशबोर्ड', tabAddExpense:'खर्च जोड़ें', tabHistory:'हिस्ट्री', tabLaluAdvance:'लालू एडवांस', tabSettings:'सेटिंग्स', tabAuditLogs:'ऑडिट लॉग्स',
         lblBudget:'कुल बजट', lblSpent:'कुल खर्च', lblContractor:'कार्य भुगतान', lblMaterial:'सामग्री', lblLaluBal:'लालू एडवांस बैलेंस',
         visualBudgetTitle:'बजट प्रगति', visualBudgetDesc:'बजट का कितना हिस्सा इस्तेमाल हो चुका है।', usedLbl:'इस्तेमाल', spentLbl:'खर्च', remainingLbl:'बाकी', budgetLbl:'बजट',
         visualCatTitle:'श्रेणी विभाजन', visualCatDesc:'पैसा कहाँ जा रहा है।',
@@ -677,7 +744,9 @@
         PaymentMode: r.payment_mode || '', PaidTo: r.paid_to || '',
         ScreenshotUrl: r.screenshot_url || '', CreatedAt: r.created_at || '',
         PaidBy: r.paid_by || '', EntryKind: r.entry_kind || 'DirectExpense',
-        AdvanceParty: r.advance_party || ''
+        AdvanceParty: r.advance_party || '',
+        MaterialName: r.material_name || '', MaterialQty: r.material_qty || '',
+        MaterialUnit: r.material_unit || '', MaterialRate: r.material_rate || ''
       };
     }
 
@@ -750,7 +819,7 @@
     }
 
     // ─── TABS ────────────────────────────────────────────────────────────────
-    const TAB_NAMES = ['dashboard','addExpense','history','laluAdvance','settings'];
+    const TAB_NAMES = ['dashboard','addExpense','history','laluAdvance','auditLogs','settings'];
 
     function switchTab(name) {
       TAB_NAMES.forEach(n => {
@@ -911,16 +980,18 @@
     async function loadOwnerData() {
       try {
         const sb = state.supabase;
-        const [expRes, setRes, conRes] = await Promise.all([
+        const [expRes, setRes, conRes, auditRes] = await Promise.all([
           sb.from('hc_expenses').select('*').order('created_at', { ascending: false }),
           sb.from('hc_settings').select('*'),
-          sb.from('hc_contractors').select('*').order('name')
+          sb.from('hc_contractors').select('*').order('name'),
+          sb.from('hc_audit_logs').select('*').order('created_at', { ascending: false }).limit(50)
         ]);
         if (expRes.error) throw expRes.error;
         if (setRes.error) throw setRes.error;
         if (conRes.error) throw conRes.error;
 
         state.expenses = (expRes.data || []).map(mapExpense);
+        state.auditLogs = auditRes.data || [];
         state.contractors = (conRes.data || []).map(r => ({
           Name: r.name, Phone: r.phone || '', WorkType: r.work_type || '', AgreedAmount: Number(r.agreed_amount || 0)
         }));
@@ -964,6 +1035,29 @@
       renderLaluAdvance();
       renderPaidToInput();
       renderFormMode();
+      renderAuditLogs();
+    }
+
+    function renderAuditLogs() {
+      const tbody = $('auditLogsBody');
+      if (!tbody) return;
+      if (!state.auditLogs || state.auditLogs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" class="muted" style="text-align:center">No audit logs found.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = state.auditLogs.map(log => {
+        let details = '';
+        if (log.action === 'DELETE') {
+          details = `<div style="font-size:0.8rem">Deleted expense for ₹${log.old_data?.amount || 0} (${esc(log.old_data?.description || '')})</div>`;
+        } else if (log.action === 'UPDATE') {
+          details = `<div style="font-size:0.8rem">Updated expense. <br><span class="muted">Amt:</span> ₹${log.old_data?.amount||0} → ₹${log.new_data?.amount||0} <br><span class="muted">Desc:</span> ${esc(log.old_data?.description||'')} → ${esc(log.new_data?.description||'')}</div>`;
+        }
+        return `<tr>
+          <td style="font-size:0.85rem">${esc(fmtDateTime(log.created_at))}</td>
+          <td><span class="badge" style="background:${log.action === 'DELETE' ? 'var(--danger-alpha)' : 'var(--primary-alpha)'}; color:${log.action === 'DELETE' ? 'var(--danger)' : 'var(--primary)'}">${esc(log.action)}</span></td>
+          <td>${details}</td>
+        </tr>`;
+      }).join('');
     }
 
     // ─── DASHBOARD ───────────────────────────────────────────────────────────
@@ -1030,12 +1124,26 @@
         ? state.recentExpenses.map(e => `<tr>
             <td>${esc(fmtDateTime(e.Date))}</td>
             <td>${esc(catLabel(e.Category))}</td>
-            <td><div>${esc(e.Description)}</div><div class="muted" style="font-size:.78rem;margin-top:.2rem">${esc(t('typeLbl'))}: ${esc(kindLabel(e.EntryKind))} · ${esc(t('paidByLbl'))}: ${esc(e.PaidBy||'—')}</div></td>
+            <td><div>${esc(e.Description)}</div>${renderMaterialSubtext(e)}<div class="muted" style="font-size:.78rem;margin-top:.2rem">${esc(t('typeLbl'))}: ${esc(kindLabel(e.EntryKind))} · ${esc(t('paidByLbl'))}: ${esc(e.PaidBy||'—')}</div></td>
             <td>${esc(e.PaidTo)}</td>
             <td>${money(e.Amount)}</td>
             <td>${renderExpenseActions(e)}</td>
           </tr>`).join('')
         : `<tr><td colspan="6" class="muted" style="text-align:center">${esc(t('noExpenses'))}</td></tr>`;
+    }
+
+    function renderMaterialSubtext(e) {
+      if (e.Category === 'Material' && e.MaterialName) {
+        let parts = [e.MaterialName];
+        if (e.MaterialQty) {
+          let q = e.MaterialQty;
+          if (e.MaterialUnit) q += ' ' + e.MaterialUnit;
+          if (e.MaterialRate) q += ' @ ₹' + e.MaterialRate + '/' + (e.MaterialUnit || 'unit');
+          parts.push(q);
+        }
+        return `<div style="font-size:.8rem; font-weight:600; color:var(--primary); margin-top:.2rem; padding-left:.5rem; border-left:2px solid var(--primary-hl);">↳ ${esc(parts.join(' - '))}</div>`;
+      }
+      return '';
     }
 
     // ─── HISTORY ─────────────────────────────────────────────────────────────
@@ -1049,7 +1157,8 @@
       return `<div class="history-item">
         <strong>${esc(fmtDateTime(e.Date))} · ${esc(catLabel(e.Category))} · ${money(e.Amount)}</strong>
         <div>${esc(e.Description)}</div>
-        <div class="history-meta">${esc(t('paidToLbl'))}: ${esc(e.PaidTo||'—')} · ${esc(t('paidByLbl'))}: ${esc(e.PaidBy||'—')} · ${esc(t('typeLbl'))}: ${esc(kindLabel(e.EntryKind))}${e.AdvanceParty ? ` · ${esc(t('advPartyLbl'))}: ${esc(e.AdvanceParty)}` : ''} · ${esc(t('modeLbl'))}: ${esc(e.PaymentMode||'—')}</div>
+        ${renderMaterialSubtext(e)}
+        <div class="history-meta" style="margin-top:0.4rem;">${esc(t('paidToLbl'))}: ${esc(e.PaidTo||'—')} · ${esc(t('paidByLbl'))}: ${esc(e.PaidBy||'—')} · ${esc(t('typeLbl'))}: ${esc(kindLabel(e.EntryKind))}${e.AdvanceParty ? ` · ${esc(t('advPartyLbl'))}: ${esc(e.AdvanceParty)}` : ''} · ${esc(t('modeLbl'))}: ${esc(e.PaymentMode||'—')}</div>
         <div class="history-actions">
           ${e.ScreenshotUrl ? `<a href="${esc(e.ScreenshotUrl)}" target="_blank" rel="noreferrer" class="btn btn-secondary btn-sm">${esc(t('openBill'))}</a>` : ''}
           ${renderExpenseActions(e)}
@@ -1146,7 +1255,30 @@
         cat.disabled = false; paidBy.disabled = false;
         hint.classList.add('hidden'); hint.textContent = '';
       }
+      
+      const matGroup = $('materialGroup');
+      const customMatGroup = $('customMaterialGroup');
+      const matName = $('expMaterialName');
+      if (cat.value === 'Material') {
+        matGroup.classList.remove('hidden');
+        if (matName.value === 'Other') {
+          customMatGroup.classList.remove('hidden');
+        } else {
+          customMatGroup.classList.add('hidden');
+        }
+      } else {
+        matGroup.classList.add('hidden');
+      }
+      
       renderPaidToInput();
+    }
+
+    function calcMaterialTotal() {
+      const qty = parseFloat($('expMaterialQty').value);
+      const rate = parseFloat($('expMaterialRate').value);
+      if (!isNaN(qty) && !isNaN(rate)) {
+        $('expAmount').value = (qty * rate).toFixed(2);
+      }
     }
 
     function handlePaidByChange() {
@@ -1204,6 +1336,8 @@
       $('expenseForm').reset();
       $('expEntryKind').value = ''; $('expPaidBy').value = ''; $('expCategory').value = '';
       $('expPayMode').value = ''; $('expAdvParty').value = ''; $('expTime').value = '';
+      $('expMaterialName').value = ''; $('expMaterialCustom').value = '';
+      $('expMaterialQty').value = ''; $('expMaterialUnit').value = ''; $('expMaterialRate').value = '';
       setToday();
       syncFormState();
       renderFormMode();
@@ -1238,6 +1372,31 @@
         }
         pt.value = e.PaidTo || '';
       }
+      
+      if (e.Category === 'Material') {
+        const knownMaterials = ['Cement', 'Steel/Rebar', 'Sand', 'Aggregate', 'Bricks/Blocks'];
+        if (knownMaterials.includes(e.MaterialName)) {
+          $('expMaterialName').value = e.MaterialName;
+          $('expMaterialCustom').value = '';
+        } else if (e.MaterialName) {
+          $('expMaterialName').value = 'Other';
+          $('expMaterialCustom').value = e.MaterialName;
+        } else {
+          $('expMaterialName').value = '';
+          $('expMaterialCustom').value = '';
+        }
+        $('expMaterialQty').value = e.MaterialQty || '';
+        $('expMaterialUnit').value = e.MaterialUnit || '';
+        $('expMaterialRate').value = e.MaterialRate || '';
+      } else {
+        $('expMaterialName').value = '';
+        $('expMaterialCustom').value = '';
+        $('expMaterialQty').value = '';
+        $('expMaterialUnit').value = '';
+        $('expMaterialRate').value = '';
+      }
+      syncFormState();
+
       $('expProof').value = '';
       renderFormMode();
       showBanner('Expense loaded for editing.', 'info');
@@ -1269,6 +1428,18 @@
           screenshotUrl = urlData.publicUrl;
         }
 
+        let matName = null;
+        let matQty = null;
+        let matUnit = null;
+        let matRate = null;
+
+        if ($('expCategory').value === 'Material') {
+          matName = $('expMaterialName').value === 'Other' ? $('expMaterialCustom').value.trim() : $('expMaterialName').value;
+          matQty = $('expMaterialQty').value ? Number($('expMaterialQty').value) : null;
+          matUnit = $('expMaterialUnit').value || null;
+          matRate = $('expMaterialRate').value ? Number($('expMaterialRate').value) : null;
+        }
+
         const payload = {
           expense_at: buildDateTime($('expDate').value, $('expTime').value),
           category: $('expCategory').value,
@@ -1279,7 +1450,11 @@
           paid_by: paidBy,
           screenshot_url: screenshotUrl,
           entry_kind: ek,
-          advance_party: advanceParty
+          advance_party: advanceParty,
+          material_name: matName,
+          material_qty: matQty,
+          material_unit: matUnit,
+          material_rate: matRate
         };
 
         if (isEditing) {
