@@ -80,6 +80,10 @@
     .tab-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem}
     .tab-btn{padding:.65rem 1.1rem;border-radius:999px;font-weight:600;font-size:.85rem;border:1px solid var(--border);background:var(--surface-2);color:var(--muted);transition:.15s}
     .tab-btn.active{background:var(--primary);color:var(--inverse);border-color:transparent}
+    /* Floating add button */
+    .fab{position:fixed;bottom:1.75rem;right:1.5rem;width:3.25rem;height:3.25rem;border-radius:50%;background:var(--primary);color:#fff;border:none;font-size:1.75rem;line-height:1;cursor:pointer;box-shadow:0 4px 18px rgba(0,0,0,.22);display:none;align-items:center;justify-content:center;z-index:999;transition:transform .15s,box-shadow .15s}
+    .fab:hover{transform:scale(1.08);box-shadow:0 6px 24px rgba(0,0,0,.28)}
+    .fab.visible{display:flex}
     .tab-panel{display:none}.tab-panel.active{display:block}
 
     /* FORMS */
@@ -299,12 +303,12 @@
           </div>
         </div>
         <div class="tab-row" style="margin-top:1.25rem;margin-bottom:0">
-          <button class="tab-btn active" id="tab-dashboardBtn" onclick="switchTab('dashboard')" data-i18n="tabDashboard">Dashboard</button>
-          <button class="tab-btn" id="tab-addExpenseBtn" onclick="switchTab('addExpense')" data-i18n="tabAddExpense">Add Expense</button>
-          <button class="tab-btn" id="tab-historyBtn" onclick="switchTab('history')" data-i18n="tabHistory">History</button>
-          <button class="tab-btn" id="tab-laluAdvanceBtn" onclick="switchTab('laluAdvance')" data-i18n="tabLaluAdvance">Lalu Advance</button>
-          <button class="tab-btn" id="tab-auditLogsBtn" onclick="switchTab('auditLogs')" data-i18n="tabAuditLogs">Audit Logs</button>
-          <button class="tab-btn" id="tab-settingsBtn" onclick="switchTab('settings')" data-i18n="tabSettings">Settings</button>
+          <button class="tab-btn active" id="tab-dashboardBtn"   onclick="switchTab('dashboard')"   data-i18n="tabDashboard">Dashboard</button>
+          <button class="tab-btn" id="tab-analyticsBtn"          onclick="switchTab('analytics')"   data-i18n="tabAnalytics">Analytics</button>
+          <button class="tab-btn" id="tab-historyBtn"            onclick="switchTab('history')"     data-i18n="tabHistory">History</button>
+          <button class="tab-btn" id="tab-laluAdvanceBtn"        onclick="switchTab('laluAdvance')" data-i18n="tabLaluAdvance">Lalu Advance</button>
+          <button class="tab-btn" id="tab-auditLogsBtn"          onclick="switchTab('auditLogs')"   data-i18n="tabAuditLogs">Audit Logs</button>
+          <button class="tab-btn" id="tab-settingsBtn"           onclick="switchTab('settings')"    data-i18n="tabSettings">Settings</button>
         </div>
       </div>
 
@@ -318,6 +322,26 @@
           <div class="stat"><div class="lbl" data-i18n="lblLaluBal">Lalu Advance Balance</div><div class="val" id="valLaluBal">₹—</div></div>
         </div>
 
+        <div class="panel" style="margin-top:1.25rem">
+          <h3 style="font-family:var(--font-display);font-size:1rem;margin-bottom:1rem" data-i18n="recentTitle">Recent Expenses</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th data-i18n="thDate">Date</th>
+                <th data-i18n="thCat">Category</th>
+                <th data-i18n="thDesc">Description</th>
+                <th data-i18n="thPaidTo">Paid To</th>
+                <th data-i18n="thAmount">Amount</th>
+                <th data-i18n="thActions">Actions</th>
+              </tr></thead>
+              <tbody id="recentBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANALYTICS TAB -->
+      <div id="tab-analytics" class="tab-panel">
         <div class="visual-grid">
           <div class="panel">
             <h3 style="font-family:var(--font-display);font-size:1rem" data-i18n="visualBudgetTitle">Budget Progress</h3>
@@ -348,29 +372,15 @@
           <p class="muted" style="font-size:.82rem;margin-top:.2rem" data-i18n="trendDesc">Daily spending for the most recent week.</p>
           <div id="spendTrend" class="trend-bars"></div>
         </div>
-
-        <div class="panel" style="margin-top:1.25rem">
-          <h3 style="font-family:var(--font-display);font-size:1rem;margin-bottom:1rem" data-i18n="recentTitle">Recent Expenses</h3>
-          <div class="table-wrap">
-            <table>
-              <thead><tr>
-                <th data-i18n="thDate">Date</th>
-                <th data-i18n="thCat">Category</th>
-                <th data-i18n="thDesc">Description</th>
-                <th data-i18n="thPaidTo">Paid To</th>
-                <th data-i18n="thAmount">Amount</th>
-                <th data-i18n="thActions">Actions</th>
-              </tr></thead>
-              <tbody id="recentBody"></tbody>
-            </table>
-          </div>
-        </div>
       </div>
 
       <!-- ADD EXPENSE TAB -->
       <div id="tab-addExpense" class="tab-panel">
         <div class="panel">
-          <h3 id="expFormTitle" style="font-family:var(--font-display);margin-bottom:.25rem" data-i18n="addExpTitle">Add Expense</h3>
+          <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem">
+            <button class="btn btn-ghost btn-sm" onclick="clearExpenseForm()" style="padding:.35rem .75rem;font-size:.82rem">← Back</button>
+            <h3 id="expFormTitle" style="font-family:var(--font-display);margin:0" data-i18n="addExpTitle">Add Expense</h3>
+          </div>
           <p id="expFormDesc" class="muted" style="font-size:.85rem;margin-bottom:1.25rem" data-i18n="addExpDesc">Record a contractor payment or construction expense.</p>
           <form id="expenseForm" onsubmit="saveExpense(event)">
             <div class="form-grid">
@@ -612,6 +622,9 @@
           </div>
         </div>
       </div>
+
+      <!-- Floating Add Expense button -->
+      <button class="fab" id="addExpFab" onclick="openAddExpense()" title="Add Expense">+</button>
     </section>
 
     <!-- CONTRACTOR DASHBOARD -->
@@ -656,7 +669,7 @@
         ownerAuthTitle:'Owner Login', ownerAuthDesc:'Sign in or create an account.', loginBtn:'Log In', signupBtn:'Sign Up', cancelBtn:'← Back',
         contractorAuthTitle:'Contractor Login', contractorAuthDesc:"Enter the owner's email, your phone and PIN.", ownerEmailLbl:"Owner's Email", cPhoneLbl:'Phone Number', cPinLbl:'PIN',
         dashTitle:'Project Dashboard', dashDesc:'Budget, expenses, payments — all in one place.', refreshBtn:'Refresh',
-        tabDashboard:'Dashboard', tabAddExpense:'Add Expense', tabHistory:'History', tabLaluAdvance:'Lalu Advance', tabSettings:'Settings', tabAuditLogs:'Audit Logs',
+        tabDashboard:'Dashboard', tabAnalytics:'Analytics', tabAddExpense:'Add Expense', tabHistory:'History', tabLaluAdvance:'Lalu Advance', tabSettings:'Settings', tabAuditLogs:'Audit Logs',
         lblBudget:'Total Budget', lblSpent:'Total Spent', lblContractor:'Work Payments', lblMaterial:'Material', lblLaluBal:'Lalu Advance Balance',
         visualBudgetTitle:'Budget Progress', visualBudgetDesc:'How much of the project budget is used.', usedLbl:'Used', spentLbl:'Spent', remainingLbl:'Remaining', budgetLbl:'Budget',
         visualCatTitle:'Category Split', visualCatDesc:'Where the money is going.',
@@ -697,7 +710,7 @@
         ownerAuthTitle:'मालिक लॉगिन', ownerAuthDesc:'साइन इन करें या खाता बनाएं।', loginBtn:'लॉगिन', signupBtn:'साइन अप', cancelBtn:'← वापस',
         contractorAuthTitle:'ठेकेदार लॉगिन', contractorAuthDesc:'मालिक का ईमेल, फोन और पिन दर्ज करें।', ownerEmailLbl:'मालिक का ईमेल', cPhoneLbl:'फोन नंबर', cPinLbl:'पिन',
         dashTitle:'प्रोजेक्ट डैशबोर्ड', dashDesc:'बजट, खर्च, भुगतान — सब एक जगह।', refreshBtn:'रिफ्रेश',
-        tabDashboard:'डैशबोर्ड', tabAddExpense:'खर्च जोड़ें', tabHistory:'हिस्ट्री', tabLaluAdvance:'लालू एडवांस', tabSettings:'सेटिंग्स', tabAuditLogs:'ऑडिट लॉग्स',
+        tabDashboard:'डैशबोर्ड', tabAnalytics:'एनालिटिक्स', tabAddExpense:'खर्च जोड़ें', tabHistory:'हिस्ट्री', tabLaluAdvance:'लालू एडवांस', tabSettings:'सेटिंग्स', tabAuditLogs:'ऑडिट लॉग्स',
         lblBudget:'कुल बजट', lblSpent:'कुल खर्च', lblContractor:'कार्य भुगतान', lblMaterial:'सामग्री', lblLaluBal:'लालू एडवांस बैलेंस',
         visualBudgetTitle:'बजट प्रगति', visualBudgetDesc:'बजट का कितना हिस्सा इस्तेमाल हो चुका है।', usedLbl:'इस्तेमाल', spentLbl:'खर्च', remainingLbl:'बाकी', budgetLbl:'बजट',
         visualCatTitle:'श्रेणी विभाजन', visualCatDesc:'पैसा कहाँ जा रहा है।',
@@ -865,6 +878,9 @@
       if (el) el.classList.add('active');
       const isDash = id === 'owner-dashboard-view' || id === 'contractor-dashboard-view';
       $('logoutBtn').style.display = isDash ? 'inline-flex' : 'none';
+      // Show FAB only on owner dashboard (and only when not on addExpense tab)
+      const fab = $('addExpFab');
+      if (fab) fab.classList.toggle('visible', id === 'owner-dashboard-view');
       // Auto-language: Hindi for all contractor views, English for owner views
       const isContractorView = id.startsWith('contractor-');
       const isOwnerView      = id.startsWith('owner-') || id === 'landing-view';
@@ -875,14 +891,27 @@
     }
 
     // ─── TABS ────────────────────────────────────────────────────────────────
-    const TAB_NAMES = ['dashboard','addExpense','history','laluAdvance','auditLogs','settings'];
+    // addExpense is kept in the list for tab-panel toggling but has no tab button
+    const TAB_NAMES    = ['dashboard','analytics','addExpense','history','laluAdvance','auditLogs','settings'];
+    const TAB_BTN_NAMES = ['dashboard','analytics','history','laluAdvance','auditLogs','settings'];
 
     function switchTab(name) {
       TAB_NAMES.forEach(n => {
-        $(`tab-${n}`).classList.toggle('active', n === name);
-        $(`tab-${n}Btn`).classList.toggle('active', n === name);
+        const panel = $(`tab-${n}`);
+        if (panel) panel.classList.toggle('active', n === name);
       });
+      TAB_BTN_NAMES.forEach(n => {
+        const btn = $(`tab-${n}Btn`);
+        if (btn) btn.classList.toggle('active', n === name);
+      });
+      // Show FAB only when NOT on the addExpense panel
+      const fab = $('addExpFab');
+      if (fab) fab.classList.toggle('visible', name !== 'addExpense');
       hideBanner();
+    }
+
+    function openAddExpense() {
+      switchTab('addExpense');
     }
 
     // ─── SUPABASE INIT ───────────────────────────────────────────────────────
@@ -1459,7 +1488,7 @@
 
     function setToday() { $('expDate').value = fmtDateInput(new Date()); }
 
-    function clearExpenseForm() {
+    function clearExpenseForm(goBack = true) {
       state.editingId = ''; state.editingScreenshotUrl = ''; state.manualPaidBy = '';
       $('expenseForm').reset();
       $('expEntryKind').value = ''; $('expPaidBy').value = ''; $('expCategory').value = '';
@@ -1469,6 +1498,7 @@
       setToday();
       syncFormState();
       renderFormMode();
+      if (goBack) switchTab('dashboard');
     }
 
     function startEdit(id) {
@@ -1593,8 +1623,8 @@
           if (error) throw error;
         }
 
-        clearExpenseForm();
-        switchTab('addExpense');
+        clearExpenseForm(false);
+        switchTab('history');
         showBanner(t(isEditing ? 'expUpdated' : 'expSaved'), 'success');
         await loadOwnerData();
       } catch (e) {
