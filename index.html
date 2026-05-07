@@ -865,6 +865,11 @@
       if (el) el.classList.add('active');
       const isDash = id === 'owner-dashboard-view' || id === 'contractor-dashboard-view';
       $('logoutBtn').style.display = isDash ? 'inline-flex' : 'none';
+      // Auto-language: Hindi for all contractor views, English for owner views
+      const isContractorView = id.startsWith('contractor-');
+      const isOwnerView      = id.startsWith('owner-') || id === 'landing-view';
+      if (isContractorView && state.lang !== 'hi') { state.lang = 'hi'; applyLang(); }
+      else if (isOwnerView && state.lang !== 'en') { state.lang = 'en'; applyLang(); }
       hideBanner();
       window.scrollTo({ top: 0, behavior: 'auto' });
     }
