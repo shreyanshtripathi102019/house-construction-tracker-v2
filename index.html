@@ -620,6 +620,23 @@
               <!-- Rendered list of contractors -->
             </div>
           </div>
+
+          <!-- Change Password -->
+          <div class="panel">
+            <h3 style="font-family:var(--font-display);margin-bottom:.25rem" data-i18n="changePwTitle">Change Password</h3>
+            <p class="muted" style="font-size:.82rem;margin-bottom:1rem" data-i18n="changePwDesc">Update your owner account password.</p>
+            <form onsubmit="changePassword(event)" class="form-group" style="gap:.75rem">
+              <div>
+                <label class="lbl" data-i18n="newPwLbl">New Password</label>
+                <input type="password" id="newPwInput" required minlength="6" placeholder="Min. 6 characters" />
+              </div>
+              <div>
+                <label class="lbl" data-i18n="confirmPwLbl">Confirm New Password</label>
+                <input type="password" id="confirmPwInput" required minlength="6" placeholder="Repeat new password" />
+              </div>
+              <button type="submit" id="changePwBtn" class="btn btn-secondary" style="margin-top:.25rem" data-i18n="changePwBtn">Update Password</button>
+            </form>
+          </div>
         </div>
       </div>
 
@@ -693,6 +710,7 @@
         laluGivenLbl:'Total Advance Given', laluSpentLbl:'Paid by Lalu',
         laluInflow:'Advance Given', laluOutflow:'Paid by Lalu', laluRunBal:'Running Balance',
         setBudgetTitle:'Set Total Budget', setBudgetLbl:'Budget Amount (₹)', saveBudgetBtn:'Save Budget',
+        changePwTitle:'Change Password', changePwDesc:'Update your owner account password.', newPwLbl:'New Password', confirmPwLbl:'Confirm New Password', changePwBtn:'Update Password',
         addContractorTitle:'Add / Update Contractor', cNameLbl:'Name', cPinLbl2:'Login PIN', cWorkLbl:'Work Type', cAgreedLbl:'Agreed Amount (₹)', saveContractorBtn:'Save Contractor',
         cMultiDesc:'Select an owner to view your agreement and payments.', cPinOptional:'(optional)',
         cDashDesc:'Payments recorded for your work.', cTotalLbl:'Total Received', cAgreedLbl2:'Agreed Amount', cWorkLbl2:'Work Type',
@@ -734,6 +752,7 @@
         laluGivenLbl:'कुल दिया एडवांस', laluSpentLbl:'लालू द्वारा भुगतान',
         laluInflow:'दिया गया एडवांस', laluOutflow:'लालू द्वारा खर्च', laluRunBal:'चलता बैलेंस',
         setBudgetTitle:'कुल बजट सेट करें', setBudgetLbl:'बजट राशि (₹)', saveBudgetBtn:'बजट सेव करें',
+        changePwTitle:'पासवर्ड बदलें', changePwDesc:'अपना मालिक खाता पासवर्ड अपडेट करें।', newPwLbl:'नया पासवर्ड', confirmPwLbl:'पासवर्ड दोबारा दर्ज करें', changePwBtn:'पासवर्ड अपडेट करें',
         addContractorTitle:'ठेकेदार जोड़ें / अपडेट करें', cNameLbl:'नाम', cPinLbl2:'लॉगिन पिन', cWorkLbl:'काम का प्रकार', cAgreedLbl:'तय राशि (₹)', saveContractorBtn:'ठेकेदार सेव करें',
         cMultiDesc:'अपने मालिक चुनें और भुगतान देखें।', cPinOptional:'(वैकल्पिक)',
         cDashDesc:'आपके काम के लिए दर्ज भुगतानों का इतिहास।', cTotalLbl:'कुल प्राप्त', cAgreedLbl2:'तय राशि', cWorkLbl2:'काम का प्रकार',
@@ -1654,6 +1673,25 @@
     }
 
     // ─── BUDGET & CONTRACTORS ────────────────────────────────────────────────
+    async function changePassword(event) {
+      event.preventDefault();
+      const newPw     = $('newPwInput').value;
+      const confirmPw = $('confirmPwInput').value;
+      if (newPw !== confirmPw) { showBanner('Passwords do not match.', 'error'); return; }
+      const btn = $('changePwBtn');
+      btn.disabled = true; btn.textContent = 'Updating…';
+      try {
+        const { error } = await state.supabase.auth.updateUser({ password: newPw });
+        if (error) throw error;
+        $('newPwInput').value = ''; $('confirmPwInput').value = '';
+        showBanner('Password updated successfully.', 'success');
+      } catch (e) {
+        showBanner(e.message, 'error');
+      } finally {
+        btn.disabled = false; btn.textContent = t('changePwBtn');
+      }
+    }
+
     async function saveBudget(event) {
       event.preventDefault();
       const amount = Number($('budgetInput').value);
