@@ -97,12 +97,31 @@
     th{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
     tbody tr:hover{background:var(--surface-2)}
 
+    /* HISTORY FILTERS */
+    .history-filters{display:flex;flex-direction:column;gap:.6rem;margin-bottom:1rem}
+    .history-search{width:100%;padding:.55rem .85rem;border:1px solid var(--border);border-radius:.75rem;background:var(--surface);color:var(--text);font-size:.88rem;box-sizing:border-box}
+    .filter-row{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center}
+    .filter-lbl{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);white-space:nowrap;margin-right:.15rem}
+    .filter-pill{padding:.3rem .75rem;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.8rem;cursor:pointer;transition:background .12s,color .12s;white-space:nowrap}
+    .filter-pill.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+    .history-summary{font-size:.8rem;color:var(--muted);margin-bottom:.6rem}
+    .history-summary strong{color:var(--text)}
+
     /* HISTORY ITEMS */
-    .history-list{display:grid;gap:.85rem}
-    .history-item{border:1px solid var(--border);border-radius:var(--r-lg);padding:1.1rem;background:var(--surface)}
-    .history-item strong{display:block;margin-bottom:.4rem}
-    .history-meta{color:var(--muted);font-size:.82rem;margin-top:.4rem}
-    .history-actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.75rem}
+    .history-list{display:grid;gap:.7rem}
+    .history-item{border:1px solid var(--border);border-radius:var(--r-lg);padding:.9rem 1rem;background:var(--surface)}
+    .hi-date{font-size:.75rem;color:var(--muted);margin-bottom:.2rem}
+    .hi-top{display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem;margin-bottom:.5rem}
+    .hi-desc{font-size:.9rem;font-weight:600;line-height:1.35}
+    .hi-amount{font-size:1.05rem;font-weight:700;white-space:nowrap}
+    .hi-chips{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.5rem}
+    .hi-chip{font-size:.7rem;padding:.15rem .55rem;border-radius:.5rem;background:var(--bg);border:1px solid var(--border);color:var(--muted);font-weight:500}
+    .hi-chip.cat{color:var(--text);font-weight:700}
+    .hi-chip.adv{background:color-mix(in srgb,#ffc107 15%,transparent);border-color:#ffc107;color:#856404}
+    .hi-chip.set{background:color-mix(in srgb,#198754 15%,transparent);border-color:#198754;color:#0f5132}
+    [data-theme=dark] .hi-chip.adv{color:#ffc107}
+    [data-theme=dark] .hi-chip.set{color:#75b798}
+    .history-actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.4rem}
 
     /* ADVANCE LEDGER */
     .advance-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:1.25rem}
@@ -486,8 +505,31 @@
       <!-- HISTORY TAB -->
       <div id="tab-history" class="tab-panel">
         <div class="panel">
-          <h3 style="font-family:var(--font-display);margin-bottom:.25rem" data-i18n="historyTitle">Expense History</h3>
-          <p class="muted" style="font-size:.85rem;margin-bottom:1.25rem" data-i18n="historyDesc">All saved expenses in reverse chronological order.</p>
+          <h3 style="font-family:var(--font-display);margin-bottom:.75rem" data-i18n="historyTitle">Expense History</h3>
+
+          <!-- Filters -->
+          <div class="history-filters">
+            <input id="historySearch" class="history-search" type="text"
+              placeholder="Search description or paid to…" oninput="renderHistory()" />
+            <div class="filter-row">
+              <span class="filter-lbl" data-i18n="filterCat">Category</span>
+              <button class="filter-pill active" onclick="setHFilter('cat','ALL',this)"          data-i18n="filterAll">All</button>
+              <button class="filter-pill"        onclick="setHFilter('cat','Material',this)"     data-i18n="categoryMaterial">Material</button>
+              <button class="filter-pill"        onclick="setHFilter('cat','Contractor',this)"   data-i18n="categoryContractor">Contractor</button>
+              <button class="filter-pill"        onclick="setHFilter('cat','Equipment',this)"    data-i18n="categoryEquipment">Equipment</button>
+              <button class="filter-pill"        onclick="setHFilter('cat','Miscellaneous',this)" data-i18n="categoryMisc">Misc</button>
+              <button class="filter-pill"        onclick="setHFilter('cat','Advance',this)"      data-i18n="categoryAdvance">Advance</button>
+            </div>
+            <div class="filter-row">
+              <span class="filter-lbl" data-i18n="filterType">Type</span>
+              <button class="filter-pill active" onclick="setHFilter('type','ALL',this)"                data-i18n="filterAll">All</button>
+              <button class="filter-pill"        onclick="setHFilter('type','DirectExpense',this)"      data-i18n="entryDirect">Direct</button>
+              <button class="filter-pill"        onclick="setHFilter('type','AdvanceGiven',this)"       data-i18n="entryAdvance">Advance</button>
+              <button class="filter-pill"        onclick="setHFilter('type','AdvanceSettlement',this)"  data-i18n="entrySettle">Settlement</button>
+            </div>
+          </div>
+
+          <div id="historySummary" class="history-summary"></div>
           <div id="historyList" class="history-list"></div>
         </div>
       </div>
@@ -631,6 +673,9 @@
         saveExpBtn:'Save Expense', updateExpBtn:'Update Expense', cancelEditBtn:'Cancel Edit', clearFormBtn:'Clear Form',
         hintDirect:'Use for direct payments — materials, contractors, equipment, or other work.', hintAdvGiven:'Use when handing advance cash to Lalu for site work.', hintAdvSettle:"Use when Lalu spent from his advance and you're recording the actual expense.",
         historyTitle:'Expense History', historyDesc:'All saved expenses in reverse chronological order.',
+        filterAll:'All', filterCat:'Category', filterType:'Type',
+        categoryMaterial:'Material', categoryContractor:'Contractor', categoryEquipment:'Equipment', categoryMisc:'Misc', categoryAdvance:'Advance',
+        entryDirect:'Direct', entryAdvance:'Advance', entrySettle:'Settlement',
         laluTitle:'Lalu Advance Ledger', laluDesc:'Advances given to Lalu, what he spent, and the running balance.',
         laluGivenLbl:'Total Advance Given', laluSpentLbl:'Paid by Lalu',
         laluInflow:'Advance Given', laluOutflow:'Paid by Lalu', laluRunBal:'Running Balance',
@@ -669,6 +714,9 @@
         saveExpBtn:'खर्च सेव करें', updateExpBtn:'खर्च अपडेट करें', cancelEditBtn:'एडिट रद्द करें', clearFormBtn:'फॉर्म साफ करें',
         hintDirect:'सामग्री, ठेकेदार, उपकरण के लिए सामान्य भुगतान।', hintAdvGiven:'जब लालू को साइट के काम के लिए पैसे दें।', hintAdvSettle:'जब लालू एडवांस से खर्च कर चुका हो।',
         historyTitle:'खर्च हिस्ट्री', historyDesc:'सभी खर्च नवीनतम क्रम में।',
+        filterAll:'सभी', filterCat:'श्रेणी', filterType:'प्रकार',
+        categoryMaterial:'सामग्री', categoryContractor:'ठेकेदार', categoryEquipment:'उपकरण', categoryMisc:'अन्य', categoryAdvance:'एडवांस',
+        entryDirect:'डायरेक्ट', entryAdvance:'एडवांस', entrySettle:'सेटलमेंट',
         laluTitle:'लालू एडवांस लेजर', laluDesc:'लालू को दिए एडवांस, उसके खर्च और बैलेंस।',
         laluGivenLbl:'कुल दिया एडवांस', laluSpentLbl:'लालू द्वारा भुगतान',
         laluInflow:'दिया गया एडवांस', laluOutflow:'लालू द्वारा खर्च', laluRunBal:'चलता बैलेंस',
@@ -1177,18 +1225,63 @@
     }
 
     // ─── HISTORY ─────────────────────────────────────────────────────────────
+    const hFilter = { cat: 'ALL', type: 'ALL' };
+
+    function setHFilter(dim, val, btn) {
+      hFilter[dim] = val;
+      btn.closest('.filter-row').querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      renderHistory();
+    }
+
     function renderHistory() {
-      $('historyList').innerHTML = state.expenses.length
-        ? sortDesc(state.expenses).map(e => historyItem(e)).join('')
+      const search = ($('historySearch')?.value || '').toLowerCase();
+      const all = sortDesc(state.expenses || []);
+
+      const filtered = all.filter(e => {
+        if (hFilter.cat  !== 'ALL' && e.Category  !== hFilter.cat)  return false;
+        if (hFilter.type !== 'ALL' && e.EntryKind !== hFilter.type) return false;
+        if (search) {
+          const hay = `${e.Description} ${e.PaidTo} ${e.PaidBy}`.toLowerCase();
+          if (!hay.includes(search)) return false;
+        }
+        return true;
+      });
+
+      const sumEl = $('historySummary');
+      if (sumEl) {
+        if (filtered.length) {
+          const total = filtered.reduce((s, e) => s + (countsTowardSpend(e) ? e.Amount : 0), 0);
+          sumEl.innerHTML = `${filtered.length} ${filtered.length === 1 ? 'entry' : 'entries'} &middot; Total spend <strong>${money(total)}</strong>`;
+        } else {
+          sumEl.innerHTML = '';
+        }
+      }
+
+      $('historyList').innerHTML = filtered.length
+        ? filtered.map(e => historyItem(e)).join('')
         : `<div class="history-item muted">${esc(t('noExpenses'))}</div>`;
     }
 
     function historyItem(e) {
+      const kindCls = e.EntryKind === 'AdvanceGiven' ? 'adv' : e.EntryKind === 'AdvanceSettlement' ? 'set' : '';
+      const chips = [
+        `<span class="hi-chip cat">${esc(catLabel(e.Category))}</span>`,
+        kindCls ? `<span class="hi-chip ${kindCls}">${esc(kindLabel(e.EntryKind))}</span>` : '',
+        e.PaidTo       ? `<span class="hi-chip">→ ${esc(e.PaidTo)}</span>`       : '',
+        e.PaidBy       ? `<span class="hi-chip">by ${esc(e.PaidBy)}</span>`       : '',
+        e.PaymentMode  ? `<span class="hi-chip">${esc(e.PaymentMode)}</span>`     : '',
+        e.AdvanceParty ? `<span class="hi-chip">${esc(t('advPartyLbl'))}: ${esc(e.AdvanceParty)}</span>` : '',
+      ].filter(Boolean).join('');
+
       return `<div class="history-item">
-        <strong>${esc(fmtDateTime(e.Date))} · ${esc(catLabel(e.Category))} · ${money(e.Amount)}</strong>
-        <div>${esc(e.Description)}</div>
+        <div class="hi-date">${esc(fmtDateTime(e.Date))}</div>
+        <div class="hi-top">
+          <div class="hi-desc">${esc(e.Description || '—')}</div>
+          <div class="hi-amount">${money(e.Amount)}</div>
+        </div>
+        <div class="hi-chips">${chips}</div>
         ${renderMaterialSubtext(e)}
-        <div class="history-meta" style="margin-top:0.4rem;">${esc(t('paidToLbl'))}: ${esc(e.PaidTo||'—')} · ${esc(t('paidByLbl'))}: ${esc(e.PaidBy||'—')} · ${esc(t('typeLbl'))}: ${esc(kindLabel(e.EntryKind))}${e.AdvanceParty ? ` · ${esc(t('advPartyLbl'))}: ${esc(e.AdvanceParty)}` : ''} · ${esc(t('modeLbl'))}: ${esc(e.PaymentMode||'—')}</div>
         <div class="history-actions">
           ${e.ScreenshotUrl ? `<a href="${esc(e.ScreenshotUrl)}" target="_blank" rel="noreferrer" class="btn btn-secondary btn-sm">${esc(t('openBill'))}</a>` : ''}
           ${renderExpenseActions(e)}
